@@ -1,0 +1,9 @@
+{
+  "name": "fas",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git clone https://ahmadyarMeo@bitbucket.org/ahmadyarMeo/fire-alarm-system.git",
+  "author": "ahmad yar meo",
+  "license": "MIT",
+  "private": true
+}
