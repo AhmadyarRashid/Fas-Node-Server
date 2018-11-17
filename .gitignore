@@ -1,2 +1,7 @@
 node_modules
 package-lock.json
+.idea/fas.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/workspace.xml
+yarn.lock
