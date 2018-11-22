@@ -5,3 +5,4 @@ package-lock.json
 .idea/modules.xml
 .idea/workspace.xml
 yarn.lock
+.idea/vcs.xml

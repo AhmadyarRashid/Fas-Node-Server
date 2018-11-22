@@ -7,6 +7,10 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "mongodb": "^3.1.10"
+    "express": "^4.16.4",
+    "http": "^0.0.0",
+    "mongodb": "^3.1.10",
+    "mongoose": "^5.3.13",
+    "socket.io": "^2.1.1"
   }
 }
