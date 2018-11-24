@@ -70,6 +70,81 @@ io.on('connection', (socket) => {
 
     });
 
+    socket.on('loginConfirm' , (data) => {
+        if (data) {
+            console.log(data['uniqueId'], data['email'], data['password']);
+            db.loginValidate(data).then((result) => {
+                if (result) {
+                    if (data['email'] == result['email'] && data['password'] == result['pass']) {
+                        let res = {
+                            id: data['projectId'],
+                            email: data['email'],
+                            uniqueId: data['uniqueId'],
+                            password : data['password'],
+                            message: true
+                        };
+                        console.log(res);
+                        io.emit('InformConfirmLogin' + data['uniqueId'], res);
+                        return;
+                    } else if (data['email'] == result['email'] && data['pwd'] != result['pass']) {
+                        let res = {
+                            id: data['projectId'],
+                            email: data['email'],
+                            uniqueId: data['uniqueId'],
+                            message: false
+                        };
+                        console.log(res);
+                        io.emit('InformConfirmLogin' + data['uniqueId'], res);
+                        return;
+                    } else {
+
+                    }
+                }
+            }).catch((err) => {
+                if (err) {
+                    if (err == 'No data found') {
+                        let res = {
+                            email: data['email'],
+                            uniqueId: data['uniqueId'],
+                            message: false
+                        };
+                        console.log(res);
+                        io.emit('InformConfirmLogin' + data['uniqueId'], res);
+                        return;
+                    } else {
+                        let res = {
+                            email: data['email'],
+                            uniqueId: data['uniqueId'],
+                            message: false
+                        };
+                        console.log(res);
+                        io.emit('InformConfirmLogin' + data['uniqueId'], res);
+                        return;
+                    }
+                }
+            });
+        }
+    });
+
+    socket.on('FirstTimeGetAllData' , (data) => {
+       console.log(data);
+       db.requestAllData(data).then((res) => {
+          if (res){
+              io.emit('SendAllDataFT' + data['uniqueId'] , res);
+          }
+       }).catch((err) => {
+           if (err){
+               io.emit('SendAllDataFT' + data['uniqueId'] , err);
+           }
+       });
+    });
+
+    socket.on('changeLabel' , (data) => {
+        console.log(data);
+       // db.updateLabel(data);
+        io.emit('InformChangeLabel' + data['projectId'] , data);
+    });
+
     socket.on('disconnect', () => {
         console.log('user disconnect');
     });
