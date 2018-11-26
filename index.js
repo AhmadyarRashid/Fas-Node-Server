@@ -139,10 +139,41 @@ io.on('connection', (socket) => {
        });
     });
 
+    socket.on('refreshData' , (data) => {
+        console.log('------------------- refresh data event trigger ---------------');
+        db.requestAllData(data).then((res) => {
+            if (res){
+                io.emit('InformRefreshData' + data['uniqueId']+ data['projectId'] , res);
+            }
+         }).catch((err) => {
+             if (err){
+                 io.emit('InformRefreshData' + data['uniqueId'] +data['projectId'] , err);
+             }
+         });
+    });
+
     socket.on('changeLabel' , (data) => {
         console.log(data);
        // db.updateLabel(data);
         io.emit('InformChangeLabel' + data['projectId'] , data);
+    });
+
+    socket.on('addNewCategory' , (data) => {
+        console.log('--------------- add new category event -----------');
+        console.log(data);
+        io.emit('InformToNewCategory' + data['projectId'] , data);
+    });
+
+    socket.on('deleteCategory' , (data) => {
+        console.log('----- delete category -----');
+        console.log(data);
+        io.emit('InformDeleteCategory' + data['projectId'] , data);
+    });
+
+    socket.on('changeCategory' , (data) => {
+        console.log('------------ change category of device ---------');
+        console.log(data);
+        io.emit('InformChangeCategory' + data['projectId'] , data);
     });
 
     socket.on('disconnect', () => {
