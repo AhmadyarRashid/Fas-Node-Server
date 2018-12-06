@@ -23,7 +23,7 @@ io.on('connection', (socket) => {
                             id: result['_id'],
                             email: data['email'],
                             uniqueId: data['uniqueId'],
-                            password : data['pwd'],
+                            password: data['pwd'],
                             message: 'sucessfull'
                         };
                         console.log(res);
@@ -70,7 +70,7 @@ io.on('connection', (socket) => {
 
     });
 
-    socket.on('loginConfirm' , (data) => {
+    socket.on('loginConfirm', (data) => {
         if (data) {
             console.log(data['uniqueId'], data['email'], data['password']);
             db.loginValidate(data).then((result) => {
@@ -80,7 +80,7 @@ io.on('connection', (socket) => {
                             id: data['projectId'],
                             email: data['email'],
                             uniqueId: data['uniqueId'],
-                            password : data['password'],
+                            password: data['password'],
                             message: true
                         };
                         console.log(res);
@@ -126,54 +126,87 @@ io.on('connection', (socket) => {
         }
     });
 
-    socket.on('FirstTimeGetAllData' , (data) => {
-       console.log(data);
-       db.requestAllData(data).then((res) => {
-          if (res){
-              io.emit('SendAllDataFT' + data['uniqueId'] , res);
-          }
-       }).catch((err) => {
-           if (err){
-               io.emit('SendAllDataFT' + data['uniqueId'] , err);
-           }
-       });
+    socket.on('FirstTimeGetAllData', (data) => {
+        console.log(data);
+        db.requestAllData(data).then((res) => {
+            if (res) {
+                io.emit('SendAllDataFT' + data['uniqueId'], res);
+            }
+        }).catch((err) => {
+            if (err) {
+                io.emit('SendAllDataFT' + data['uniqueId'], err);
+            }
+        });
     });
 
-    socket.on('refreshData' , (data) => {
+    socket.on('refreshData', (data) => {
         console.log('------------------- refresh data event trigger ---------------');
         db.requestAllData(data).then((res) => {
-            if (res){
-                io.emit('InformRefreshData' + data['uniqueId']+ data['projectId'] , res);
+            if (res) {
+                io.emit('InformRefreshData' + data['uniqueId'] + data['projectId'], res);
             }
-         }).catch((err) => {
-             if (err){
-                 io.emit('InformRefreshData' + data['uniqueId'] +data['projectId'] , err);
-             }
-         });
+        }).catch((err) => {
+            if (err) {
+                io.emit('InformRefreshData' + data['uniqueId'] + data['projectId'], err);
+            }
+        });
     });
 
-    socket.on('changeLabel' , (data) => {
+    socket.on('changeLabel', (data) => {
         console.log(data);
-       // db.updateLabel(data);
-        io.emit('InformChangeLabel' + data['projectId'] , data);
+
+        db.updateLabel(data).then((doc) => {
+            io.emit('InformChangeLabel' + data['projectId'], data);
+            console.log(doc);
+        }).catch((err) => {
+            io.emit('InformChangeLabel' + data['projectId'], data);
+            console.log(err);
+        });
+
     });
 
-    socket.on('addNewCategory' , (data) => {
+    socket.on('addNewCategory', (data) => {
         console.log('--------------- add new category event -----------');
         console.log(data);
-        io.emit('InformToNewCategory' + data['projectId'] , data);
+        db.addNewCategory(data).then((doc) => {
+            io.emit('InformToNewCategory' + data['projectId'], data);
+            console.log(doc);
+        }).catch((err) => {
+            io.emit('InformToNewCategory' + data['projectId'], data);
+            console.log(err);
+        });
     });
 
-    socket.on('deleteCategory' , (data) => {
+    socket.on('deleteCategory', (data) => {
         console.log('----- delete category -----');
         console.log(data);
-        io.emit('InformDeleteCategory' + data['projectId'] , data);
+        db.deleteCategory(data).then((doc) => {
+            io.emit('InformDeleteCategory' + data['projectId'], data);
+            console.log(doc);
+        }).catch((err) => {
+            io.emit('InformDeleteCategory' + data['projectId'], data);
+            console.log(err);
+        });
     });
 
-    socket.on('changeCategory' , (data) => {
+    socket.on('changeCategory', (data) => {
         console.log('------------ change category of device ---------');
         console.log(data);
-        io.emit('InformChangeCategory' + data['projectId'] , data);
+        db.updateCategory(data).then((doc) => {
+            io.emit('InformChangeCategory' + data['projectId'], data);
+            console.log(doc);
+        }).catch((err) => {
+            io.emit('InformChangeCategory' + data['projectId'], data);
+            console.log(err);
+        });
+    });
+
+    socket.on('changePassword', (data) => {
+        console.log('------------ password change -----------');
+        console.log(data);
+        io.emit('infoChangePassword' + data['uniqueId'], {
+            status: 'OK'
+        });
     });
 
     socket.on('disconnect', () => {

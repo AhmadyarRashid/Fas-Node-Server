@@ -104,27 +104,131 @@ const updateLabel = (data) => {
                     deviceId = data['deviceId'],
                     newLabel = data['newLabel'];
 
-                collection.findOneAndUpdate(
-                    {
-                        _id: '5bf5b1c0419972aae5e1eba1',
-                        'userType.devices': {
-                            _id: '5bf71724e60c643450746661'
-                        }
-                    },
-                    {
-                        '$set': {
-                            'userType.devices': {'label': 'hello world'}
-                        }
+              collection.findOne({'_id': projId} , (err , doc) => {
+                    if (err){
+                        reject('no data found');
                     }
-                ).then((res) => {
-                    if (res) {
-                        console.log('label update sucessfully');
-                    }
-                }).catch((e) => {
-                    if (e) {
-                        console.log('error occur in update query', e);
-                    }
+                   // resolve(doc['userType']['devices']);
+                  let allDevices = doc['userType']['devices'];
+                  allDevices.forEach((d) => {
+                      if (d['deviceId'] == deviceId){
+                         // resolve(d);
+                         const res = collection.updateOne(
+                              {"_id": projId, "userType.devices.deviceId": deviceId},
+                              {
+                                  $set: { "userType.devices.$.label":newLabel }
+                              }
+                          );
+                         resolve(res);
+                      }
+                  })
                 });
+
+            });
+            client.close();
+        }, 100);
+    });
+};
+
+const updateCategory = (data) => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            const client = new MongoClient('mongodb://localhost:27017');
+            client.connect(function (err) {
+                if (err) {
+                    reject('db connection error');
+                    assert.equal(null, err);
+                }
+                const db = client.db('FAS');
+                const collection = db.collection('users');
+                const projId = data['projectId'],
+                    deviceId = data['deviceId'],
+                    newLabel = data['changeCat'];
+
+                collection.findOne({'_id': projId} , (err , doc) => {
+                    if (err){
+                        reject('no data found');
+                    }
+                    // resolve(doc['userType']['devices']);
+                    let allDevices = doc['userType']['devices'];
+                    allDevices.forEach((d) => {
+                        if (d['deviceId'] == deviceId){
+                            // resolve(d);
+                            const res = collection.updateOne(
+                                {"_id": projId, "userType.devices.deviceId": deviceId},
+                                {
+                                    $set: { "userType.devices.$.category":newLabel }
+                                }
+                            );
+                            resolve(res);
+                        }
+                    })
+                });
+
+            });
+            client.close();
+        }, 100);
+    });
+};
+
+const addNewCategory = (data) => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            const client = new MongoClient('mongodb://localhost:27017');
+            client.connect(function (err) {
+                if (err) {
+                    reject('db connection error');
+                    assert.equal(null, err);
+                }
+                const db = client.db('FAS');
+                const collection = db.collection('users');
+                const projId = data['projectId'],
+                    newCat = data['newCat'];
+
+                collection.findOne({'_id': projId} , (err , doc) => {
+                    if (err){
+                        reject('no data found');
+                    }
+                    var res = collection.update(
+                        {'_id' : projId} ,
+                        { $push: { 'userType.categories': newCat } }
+                        );
+                    resolve(res);
+
+                });
+
+            });
+            client.close();
+        }, 100);
+    });
+};
+
+const deleteCategory = (data) => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            const client = new MongoClient('mongodb://localhost:27017');
+            client.connect(function (err) {
+                if (err) {
+                    reject('db connection error');
+                    assert.equal(null, err);
+                }
+                const db = client.db('FAS');
+                const collection = db.collection('users');
+                const projId = data['projectId'],
+                    newCat = data['delCat'];
+
+                collection.findOne({'_id': projId} , (err , doc) => {
+                    if (err){
+                        reject('no data found');
+                    }
+                    var res = collection.update(
+                        {'_id' : projId} ,
+                        { $pull: { 'userType.categories': newCat } }
+                    );
+                    resolve(res);
+
+                });
+
             });
             client.close();
         }, 100);
@@ -135,5 +239,8 @@ module.exports = {
     loginValidate,
     loginConfirm,
     requestAllData,
-    updateLabel
+    updateLabel,
+    updateCategory,
+    addNewCategory,
+    deleteCategory
 };
