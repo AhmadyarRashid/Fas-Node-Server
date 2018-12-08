@@ -4,14 +4,15 @@ const assert = require('assert');
 const loginValidate = (data) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            const client = new MongoClient('mongodb://localhost:27017');
+            const client = new MongoClient('mongodb://localhost:27017' , { useNewUrlParser: true });
             client.connect(function (err) {
                 if (err) {
+                    console.log('>>>backend file connection error');
                     reject('db connection error');
                     assert.equal(null, err);
                 }
                 const db = client.db('FAS');
-                const collection = db.collection('login');
+                const collection = db.collection('logins');
                 collection.findOne({email: data['email']}).then((doc) => {
                     if (doc) {
                         resolve(doc);
@@ -32,14 +33,15 @@ const loginValidate = (data) => {
 const loginConfirm = (data) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            const client = new MongoClient('mongodb://localhost:27017');
+            const client = new MongoClient('mongodb://localhost:27017', { useNewUrlParser: true });
             client.connect(function (err) {
                 if (err) {
+                    console.log('>>>backend file connection error');
                     reject('db connection error');
                     assert.equal(null, err);
                 }
                 const db = client.db('FAS');
-                const collection = db.collection('login');
+                const collection = db.collection('logins');
                 collection.findOne({email: data['email']}).then((doc) => {
                     if (doc) {
                         resolve(doc);
@@ -60,7 +62,7 @@ const loginConfirm = (data) => {
 const requestAllData = (data) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            const client = new MongoClient('mongodb://localhost:27017');
+            const client = new MongoClient('mongodb://localhost:27017', { useNewUrlParser: true });
             client.connect(function (err) {
                 if (err) {
                     reject('db connection error');
@@ -92,7 +94,7 @@ const requestAllData = (data) => {
 const updateLabel = (data) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            const client = new MongoClient('mongodb://localhost:27017');
+            const client = new MongoClient('mongodb://localhost:27017', { useNewUrlParser: true });
             client.connect(function (err) {
                 if (err) {
                     reject('db connection error');
@@ -133,7 +135,7 @@ const updateLabel = (data) => {
 const updateCategory = (data) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            const client = new MongoClient('mongodb://localhost:27017');
+            const client = new MongoClient('mongodb://localhost:27017', { useNewUrlParser: true });
             client.connect(function (err) {
                 if (err) {
                     reject('db connection error');
@@ -174,7 +176,7 @@ const updateCategory = (data) => {
 const addNewCategory = (data) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            const client = new MongoClient('mongodb://localhost:27017');
+            const client = new MongoClient('mongodb://localhost:27017', { useNewUrlParser: true });
             client.connect(function (err) {
                 if (err) {
                     reject('db connection error');
@@ -206,7 +208,7 @@ const addNewCategory = (data) => {
 const deleteCategory = (data) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            const client = new MongoClient('mongodb://localhost:27017');
+            const client = new MongoClient('mongodb://localhost:27017', { useNewUrlParser: true });
             client.connect(function (err) {
                 if (err) {
                     reject('db connection error');
@@ -235,6 +237,41 @@ const deleteCategory = (data) => {
     });
 };
 
+const changePassword = (data) => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            const client = new MongoClient('mongodb://localhost:27017', { useNewUrlParser: true });
+            client.connect(function (err) {
+                if (err) {
+                    reject('db connection error');
+                    assert.equal(null, err);
+                }
+                const db = client.db('FAS');
+                const collection = db.collection('logins');
+                const projId = data['projectId'],
+                    email = data['email'],
+                    newPass = data['newPass'];
+
+                collection.findOne({'_id': projId} , (err , doc) => {
+                    if (err){
+                        reject('no data found');
+                    }
+                    var res = collection.updateOne(
+                        {'_id' : projId} ,
+                        { $set: { 'password': newPass } }
+                    );
+                    resolve(res);
+
+                });
+
+            });
+            client.close();
+        }, 100);
+    });
+};
+
+
+
 module.exports = {
     loginValidate,
     loginConfirm,
@@ -242,5 +279,6 @@ module.exports = {
     updateLabel,
     updateCategory,
     addNewCategory,
-    deleteCategory
+    deleteCategory,
+    changePassword
 };

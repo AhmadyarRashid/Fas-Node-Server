@@ -1,5 +1,12 @@
 const {mongoose}  = require('../db/connection');
 const {user} = require('../model/user');
+const {login} = require('../model/login');
+
+const loginUser = new login({
+    _id : '5bf5b1c0419972aae5e1eba1',
+    email : 'ahmad@gmail.com',
+    password :'123456'
+});
 
 const user1 = new user({
     _id :"5bf5b1c0419972aae5e1eba1",
@@ -76,8 +83,14 @@ const user1 = new user({
 
 
 
-user1.save().then((res) => {
-    console.log('insert sucessfully');
-} , (e) => {
-    console.log(e + 'not insert data some error');
+// user1.save().then((res) => {
+//     console.log('insert sucessfully');
+// } , (e) => {
+//     console.log(e + 'not insert data some error');
+// });
+
+loginUser.save().then((res) => {
+    console.log('user login insert data sucessfully');
+}, (e) => {
+    console.log('error occur in login');
 });

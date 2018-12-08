@@ -15,10 +15,10 @@ io.on('connection', (socket) => {
 
     socket.on('loginRequest', (data) => {
         if (data) {
-            console.log(data['uniqueId'], data['email'], data['pwd']);
+            console.log('----login request ------', data['uniqueId'], data['email'], data['pwd']);
             db.loginValidate(data).then((result) => {
                 if (result) {
-                    if (data['email'] == result['email'] && data['pwd'] == result['pass']) {
+                    if (data['email'] == result['email'] && data['pwd'] == result['password']) {
                         let res = {
                             id: result['_id'],
                             email: data['email'],
@@ -29,7 +29,7 @@ io.on('connection', (socket) => {
                         console.log(res);
                         io.emit('InformLogin' + data['uniqueId'], res);
                         return;
-                    } else if (data['email'] == result['email'] && data['pwd'] != result['pass']) {
+                    } else if (data['email'] == result['email'] && data['pwd'] != result['password']) {
                         let res = {
                             id: result['_id'],
                             email: data['email'],
@@ -72,10 +72,10 @@ io.on('connection', (socket) => {
 
     socket.on('loginConfirm', (data) => {
         if (data) {
-            console.log(data['uniqueId'], data['email'], data['password']);
+            console.log('--login confirmation in main activity---', data['uniqueId'], data['email'], data['password']);
             db.loginValidate(data).then((result) => {
                 if (result) {
-                    if (data['email'] == result['email'] && data['password'] == result['pass']) {
+                    if (data['email'] == result['email'] && data['password'] == result['password']) {
                         let res = {
                             id: data['projectId'],
                             email: data['email'],
@@ -86,7 +86,7 @@ io.on('connection', (socket) => {
                         console.log(res);
                         io.emit('InformConfirmLogin' + data['uniqueId'], res);
                         return;
-                    } else if (data['email'] == result['email'] && data['pwd'] != result['pass']) {
+                    } else if (data['email'] == result['email'] && data['password'] != result['password']) {
                         let res = {
                             id: data['projectId'],
                             email: data['email'],
@@ -127,7 +127,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('FirstTimeGetAllData', (data) => {
-        console.log(data);
+        console.log('-- first time get data ----', data);
         db.requestAllData(data).then((res) => {
             if (res) {
                 io.emit('SendAllDataFT' + data['uniqueId'], res);
@@ -153,7 +153,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('changeLabel', (data) => {
-        console.log(data);
+        console.log('---change label----', data);
 
         db.updateLabel(data).then((doc) => {
             io.emit('InformChangeLabel' + data['projectId'], data);
@@ -204,9 +204,20 @@ io.on('connection', (socket) => {
     socket.on('changePassword', (data) => {
         console.log('------------ password change -----------');
         console.log(data);
-        io.emit('infoChangePassword' + data['uniqueId'], {
-            status: 'OK'
+        db.changePassword(data).then((res) => {
+            if (res) {
+                io.emit('infoChangePassword' + data['uniqueId'], {
+                    status: 'OK'
+                });
+            }
+        }).catch((e) => {
+            if (e) {
+                io.emit('infoChangePassword' + data['uniqueId'], {
+                    status: 'Error'
+                });
+            }
         });
+
     });
 
     socket.on('disconnect', () => {

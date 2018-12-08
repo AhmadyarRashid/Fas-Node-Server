@@ -10,8 +10,8 @@ var login = mongoose.model('login', {
         required: true
     },
     password: {
-        type: 'Boolean',
-        default: false
+        type: 'String',
+        default: true
     }
 });
 
