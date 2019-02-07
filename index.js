@@ -165,6 +165,15 @@ io.on('connection', (socket) => {
 
     });
 
+    socket.on('resetDevice' , (data)=> {
+        console.log('-------------------Reset Device---------------------' , data);
+        db.resetDevice(data).then((doc)=>{
+            console.log('reset Device Sucessfully');
+        }).catch((err) => {
+            console.log('error occur in reset Device' , err);
+        })
+    });
+
     socket.on('addNewCategory', (data) => {
         console.log('--------------- add new category event -----------');
         console.log(data);
@@ -218,6 +227,12 @@ io.on('connection', (socket) => {
             }
         });
 
+    });
+
+    socket.on('AlertFire' , (data) => {
+        console.log(data);
+        io.emit('InfoAlert' + data['projectId'] , data);
+        console.log('---------------------');
     });
 
     socket.on('disconnect', () => {

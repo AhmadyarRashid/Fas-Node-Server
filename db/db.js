@@ -270,6 +270,47 @@ const changePassword = (data) => {
     });
 };
 
+const resetDevice = (data) => {
+    return new Promise((resolve, reject)=>{
+        setTimeout(()=> {
+            const client = new MongoClient('mongodb://localhost:27017', { useNewUrlParser: true });
+            client.connect(function (err) {
+                if (err) {
+                    reject('db connection error');
+                    assert.equal(null, err);
+                }
+                const db = client.db('FAS');
+                const collection = db.collection('users');
+                projectId = data['projectId'];
+                devlabel = data['label'];
+
+                collection.findOne({'_id': projectId} , (err , doc) => {
+                    if (err){
+                        reject('no data found');
+                    }
+                    let allDevices = doc['userType']['devices'];
+                    allDevices.forEach((d) => {
+                        if (d['label'] == devlabel){
+                           // resolve(d);
+                           const res = collection.updateOne(
+                                {"_id": projectId, "userType.devices.label": devlabel},
+                                {
+                                    $set: { "userType.devices.$.configuration":'false'}
+                                }
+                            );
+                           resolve(res);
+                        }
+                    })
+
+                });
+
+            });
+            client.close();
+
+        }, 0);
+    })
+}
+
 
 
 module.exports = {
@@ -280,5 +321,6 @@ module.exports = {
     updateCategory,
     addNewCategory,
     deleteCategory,
-    changePassword
+    changePassword,
+    resetDevice
 };
