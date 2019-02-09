@@ -282,7 +282,38 @@ const resetDevice = (data) => {
     })
 }
 
+const confirmationEmail = (data) => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            const client = new MongoClient('mongodb://localhost:27017', { useNewUrlParser: true });
+            client.connect(function (err) {
+                if (err) {
+                    reject('db connection error');
+                    assert.equal(null, err);
+                }
+                const db = client.db('FAS');
+                const collection = db.collection('logins');
+                email = data['email'];
+                
+                collection.findOne({ email : email}).then(res => {
+                    if(res){
+                        resolve('true');
+                    }else{
+                        resolve('false');
+                    }
+                }).catch(err => {
+                    if(err){
+                        reject(err);
+                    }
+                });
 
+
+            });
+            client.close();
+
+        }, 0);
+    })
+}
 
 module.exports = {
     loginValidate,
@@ -293,5 +324,6 @@ module.exports = {
     addNewCategory,
     deleteCategory,
     changePassword,
-    resetDevice
+    resetDevice,
+    confirmationEmail
 };

@@ -237,9 +237,23 @@ io.on('connection', (socket) => {
         console.log('---------------------');
     });
 
+    socket.on('confirmationEmail' , (data) => {
+        console.log('confirmation email' , data['uniqueId'] , data['email']);
+        db.confirmationEmail(data).then(res => {
+            if(res){
+                io.emit('InformConfirmEmail' + data['uniqueId'] , res);
+            }
+        }).catch(e => {
+            io.emit('InformConfirmEmail' + data['uniqueId'] , 'error');
+        });
+
+    })
+
     socket.on('disconnect', () => {
         console.log('user disconnect');
     });
+
+
 });
 
 server.listen(3000, () => {
