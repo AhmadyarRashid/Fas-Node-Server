@@ -4,7 +4,7 @@ const assert = require('assert');
 const loginValidate = (data) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            const client = new MongoClient('mongodb://localhost:27017' , { useNewUrlParser: true });
+            const client = new MongoClient('mongodb://localhost:27017', { useNewUrlParser: true });
             client.connect(function (err) {
                 if (err) {
                     console.log('>>>backend file connection error');
@@ -13,7 +13,7 @@ const loginValidate = (data) => {
                 }
                 const db = client.db('FAS');
                 const collection = db.collection('logins');
-                collection.findOne({email: data['email']}).then((doc) => {
+                collection.findOne({ email: data['email'] }).then((doc) => {
                     if (doc) {
                         resolve(doc);
                     } else {
@@ -33,6 +33,7 @@ const loginValidate = (data) => {
 const loginConfirm = (data) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
+            console.log('----------------login confirm data-------------');
             const client = new MongoClient('mongodb://localhost:27017', { useNewUrlParser: true });
             client.connect(function (err) {
                 if (err) {
@@ -42,7 +43,7 @@ const loginConfirm = (data) => {
                 }
                 const db = client.db('FAS');
                 const collection = db.collection('logins');
-                collection.findOne({email: data['email']}).then((doc) => {
+                collection.findOne({ email: data['email'] }).then((doc) => {
                     if (doc) {
                         resolve(doc);
                     } else {
@@ -62,31 +63,46 @@ const loginConfirm = (data) => {
 const requestAllData = (data) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            const client = new MongoClient('mongodb://localhost:27017', { useNewUrlParser: true });
+            // console.log('-----------------inside request all data--------------');
+            var client = new MongoClient('mongodb://localhost:27017', { useNewUrlParser: true });
             client.connect(function (err) {
                 if (err) {
                     reject('db connection error');
                     assert.equal(null, err);
                 }
                 const db = client.db('FAS');
-                const collection = db.collection('users');
-                collection.findOne({_id: data['projectId']}).then((doc) => {
-                    if (doc) {
-                        resolve(doc);
-                    } else {
-                        reject({
-                            message: 'noDataFound'
-                        });
+                // console.log('before query ===');
+                db.collection('users').aggregate([
+                    {
+                        $lookup: {
+                            from: 'smartDevices',
+                            localField: '_id',
+                            foreignField: '_id',
+                            as: 'devices'
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from: 'category',
+                            localField: '_id',
+                            foreignField: '_id',
+                            as: 'categories'
+                        }
                     }
-                }).catch((err) => {
+                ]).toArray((err, res) => {
                     if (err) {
-                        reject({
-                            message: 'EOIQ'
-                        });
+                        //console.log('found err = ', err);
+                        reject(err);
+                    } else {
+                        //  console.log('found data = ', res);
+                        resolve(res);
+
                     }
                 });
-                client.close();
             });
+
+            client.close();
+
         }, 0);
     });
 };
@@ -101,30 +117,18 @@ const updateLabel = (data) => {
                     assert.equal(null, err);
                 }
                 const db = client.db('FAS');
-                const collection = db.collection('users');
+                const collection = db.collection('smartDevices');
                 const projId = data['projectId'],
                     deviceId = data['deviceId'],
                     newLabel = data['newLabel'];
 
-              collection.findOne({'_id': projId} , (err , doc) => {
-                    if (err){
-                        reject('no data found');
+                const res = collection.updateOne(
+                    { "_id": projId, "devices.deviceId": deviceId },
+                    {
+                        $set: { "devices.$.label": newLabel }
                     }
-                   // resolve(doc['userType']['devices']);
-                  let allDevices = doc['userType']['devices'];
-                  allDevices.forEach((d) => {
-                      if (d['deviceId'] == deviceId){
-                         // resolve(d);
-                         const res = collection.updateOne(
-                              {"_id": projId, "userType.devices.deviceId": deviceId},
-                              {
-                                  $set: { "userType.devices.$.label":newLabel }
-                              }
-                          );
-                         resolve(res);
-                      }
-                  })
-                });
+                );
+                resolve(res);
 
             });
             client.close();
@@ -142,30 +146,19 @@ const updateCategory = (data) => {
                     assert.equal(null, err);
                 }
                 const db = client.db('FAS');
-                const collection = db.collection('users');
+                const collection = db.collection('smartDevices');
                 const projId = data['projectId'],
                     deviceId = data['deviceId'],
-                    newLabel = data['changeCat'];
+                    newCategory = data['changeCat'];
 
-                collection.findOne({'_id': projId} , (err , doc) => {
-                    if (err){
-                        reject('no data found');
+
+                const res = collection.updateOne(
+                    { "_id": projId, "devices.deviceId": deviceId },
+                    {
+                        $set: { "devices.$.category": newCategory }
                     }
-                    // resolve(doc['userType']['devices']);
-                    let allDevices = doc['userType']['devices'];
-                    allDevices.forEach((d) => {
-                        if (d['deviceId'] == deviceId){
-                            // resolve(d);
-                            const res = collection.updateOne(
-                                {"_id": projId, "userType.devices.deviceId": deviceId},
-                                {
-                                    $set: { "userType.devices.$.category":newLabel }
-                                }
-                            );
-                            resolve(res);
-                        }
-                    })
-                });
+                );
+                resolve(res);
 
             });
             client.close();
@@ -183,21 +176,16 @@ const addNewCategory = (data) => {
                     assert.equal(null, err);
                 }
                 const db = client.db('FAS');
-                const collection = db.collection('users');
+                const collection = db.collection('category');
                 const projId = data['projectId'],
                     newCat = data['newCat'];
 
-                collection.findOne({'_id': projId} , (err , doc) => {
-                    if (err){
-                        reject('no data found');
-                    }
-                    var res = collection.update(
-                        {'_id' : projId} ,
-                        { $push: { 'userType.categories': newCat } }
-                        );
-                    resolve(res);
+                var res = collection.update(
+                    { "_id": projId },
+                    { $addToSet: { categories: newCat } }
+                );
+                resolve(res);
 
-                });
 
             });
             client.close();
@@ -215,21 +203,15 @@ const deleteCategory = (data) => {
                     assert.equal(null, err);
                 }
                 const db = client.db('FAS');
-                const collection = db.collection('users');
+                const collection = db.collection('category');
                 const projId = data['projectId'],
-                    newCat = data['delCat'];
+                    delCat = data['delCat'];
 
-                collection.findOne({'_id': projId} , (err , doc) => {
-                    if (err){
-                        reject('no data found');
-                    }
-                    var res = collection.update(
-                        {'_id' : projId} ,
-                        { $pull: { 'userType.categories': newCat } }
-                    );
-                    resolve(res);
-
-                });
+                var res = collection.update(
+                    { "_id": projId },
+                    { $pull: { categories: delCat } }
+                );
+                resolve(res);
 
             });
             client.close();
@@ -252,12 +234,12 @@ const changePassword = (data) => {
                     email = data['email'],
                     newPass = data['newPass'];
 
-                collection.findOne({'_id': projId} , (err , doc) => {
-                    if (err){
+                collection.findOne({ '_id': projId }, (err, doc) => {
+                    if (err) {
                         reject('no data found');
                     }
                     var res = collection.updateOne(
-                        {'_id' : projId} ,
+                        { '_id': projId },
                         { $set: { 'password': newPass } }
                     );
                     resolve(res);
@@ -271,8 +253,8 @@ const changePassword = (data) => {
 };
 
 const resetDevice = (data) => {
-    return new Promise((resolve, reject)=>{
-        setTimeout(()=> {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
             const client = new MongoClient('mongodb://localhost:27017', { useNewUrlParser: true });
             client.connect(function (err) {
                 if (err) {
@@ -280,29 +262,18 @@ const resetDevice = (data) => {
                     assert.equal(null, err);
                 }
                 const db = client.db('FAS');
-                const collection = db.collection('users');
+                const collection = db.collection('smartDevices');
                 projectId = data['projectId'];
                 devlabel = data['label'];
 
-                collection.findOne({'_id': projectId} , (err , doc) => {
-                    if (err){
-                        reject('no data found');
+                const res = collection.updateOne(
+                    { "_id": projectId, "devices.label": devlabel },
+                    {
+                        $set: { "devices.$.configuration": 'false' }
                     }
-                    let allDevices = doc['userType']['devices'];
-                    allDevices.forEach((d) => {
-                        if (d['label'] == devlabel){
-                           // resolve(d);
-                           const res = collection.updateOne(
-                                {"_id": projectId, "userType.devices.label": devlabel},
-                                {
-                                    $set: { "userType.devices.$.configuration":'false'}
-                                }
-                            );
-                           resolve(res);
-                        }
-                    })
+                );
+                resolve(res);
 
-                });
 
             });
             client.close();

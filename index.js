@@ -130,6 +130,7 @@ io.on('connection', (socket) => {
         console.log('-- first time get data ----', data);
         db.requestAllData(data).then((res) => {
             if (res) {
+               // console.log('=================\n' , res);
                 io.emit('SendAllDataFT' + data['uniqueId'], res);
             }
         }).catch((err) => {
@@ -143,6 +144,7 @@ io.on('connection', (socket) => {
         console.log('------------------- refresh data event trigger ---------------');
         db.requestAllData(data).then((res) => {
             if (res) {
+              //  console.log(JSON.stringify(res, null, 4));
                 io.emit('InformRefreshData' + data['uniqueId'] + data['projectId'], res);
             }
         }).catch((err) => {
