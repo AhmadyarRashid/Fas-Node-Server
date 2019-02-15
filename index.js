@@ -1,14 +1,28 @@
 const express = require('express'),
     http = require('http'),
     app = express(),
+    cors = require("cors"),
+    bodyParser = require("body-parser"),
     server = http.createServer(app),
     io = require('socket.io').listen(server);
 const db = require('./db/db');
+
+app.use(bodyParser.json())
+app.use(cors())
+app.use(
+    bodyParser.urlencoded({
+        extended:false
+    })
+)
+
 
 app.get('/', (req, res) => {
     console.log('web user connected');
     res.send("welcome in fas app :)");
 });
+
+var Users = require('./routes/user')
+app.use('/users',Users)
 
 io.on('connection', (socket) => {
     console.log('android user connected');
@@ -130,7 +144,7 @@ io.on('connection', (socket) => {
         console.log('-- first time get data ----', data);
         db.requestAllData(data).then((res) => {
             if (res) {
-               // console.log('=================\n' , res);
+                // console.log('=================\n' , res);
                 io.emit('SendAllDataFT' + data['uniqueId'], res);
             }
         }).catch((err) => {
@@ -144,7 +158,7 @@ io.on('connection', (socket) => {
         console.log('------------------- refresh data event trigger ---------------');
         db.requestAllData(data).then((res) => {
             if (res) {
-              //  console.log(JSON.stringify(res, null, 4));
+                //  console.log(JSON.stringify(res, null, 4));
                 io.emit('InformRefreshData' + data['uniqueId'] + data['projectId'], res);
             }
         }).catch((err) => {
@@ -167,12 +181,12 @@ io.on('connection', (socket) => {
 
     });
 
-    socket.on('resetDevice' , (data)=> {
-        console.log('-------------------Reset Device---------------------' , data);
-        db.resetDevice(data).then((doc)=>{
+    socket.on('resetDevice', (data) => {
+        console.log('-------------------Reset Device---------------------', data);
+        db.resetDevice(data).then((doc) => {
             console.log('reset Device Sucessfully');
         }).catch((err) => {
-            console.log('error occur in reset Device' , err);
+            console.log('error occur in reset Device', err);
         })
     });
 
@@ -231,20 +245,20 @@ io.on('connection', (socket) => {
 
     });
 
-    socket.on('AlertFire' , (data) => {
+    socket.on('AlertFire', (data) => {
         console.log(data);
-        io.emit('InfoAlert' + data['projectId'] , data);
+        io.emit('InfoAlert' + data['projectId'], data);
         console.log('---------------------');
     });
 
-    socket.on('confirmationEmail' , (data) => {
-        console.log('confirmation email' , data['uniqueId'] , data['email']);
+    socket.on('confirmationEmail', (data) => {
+        console.log('confirmation email', data['uniqueId'], data['email']);
         db.confirmationEmail(data).then(res => {
-            if(res){
-                io.emit('InformConfirmEmail' + data['uniqueId'] , res);
+            if (res) {
+                io.emit('InformConfirmEmail' + data['uniqueId'], res);
             }
         }).catch(e => {
-            io.emit('InformConfirmEmail' + data['uniqueId'] , 'error');
+            io.emit('InformConfirmEmail' + data['uniqueId'], 'error');
         });
 
     })
