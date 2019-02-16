@@ -1,18 +1,15 @@
 var mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-var login = mongoose.model('login', {
-    _id :{
-      type:'String',
-      required: true
-    },
+var login = new Schema({
     email: {
         type: 'String',
         required: true
     },
     password: {
         type: 'String',
-        default: true
+        required: true
     }
 });
 
-module.exports = {login};
+module.exports = logins = mongoose.model('logins' , login);

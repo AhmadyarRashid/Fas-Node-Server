@@ -6,6 +6,7 @@ const express = require('express'),
     server = http.createServer(app),
     io = require('socket.io').listen(server);
 const db = require('./db/db');
+const mongoose = require('mongoose');
 
 app.use(bodyParser.json())
 app.use(cors())
@@ -15,14 +16,21 @@ app.use(
     })
 )
 
+const mongoURI = "mongodb://localhost:27017/FAS";
+mongoose
+    .connect(mongoURI,{useNewUrlParser:true})
+    .then(() => console.log('MongoDB connected'))
+    .catch(err => console.log(err))
+
+var Users = require('./routes/user')
+app.use('/users',Users)
+
 
 app.get('/', (req, res) => {
     console.log('web user connected');
     res.send("welcome in fas app :)");
 });
 
-var Users = require('./routes/user')
-app.use('/users',Users)
 
 io.on('connection', (socket) => {
     console.log('android user connected');

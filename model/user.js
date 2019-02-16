@@ -1,119 +1,37 @@
 //============================= user validator ==========
 var mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-var user = mongoose.model('user', {
+var userSchema = new Schema({
     _id: {
         type: String,
-        required: true,
-        unique: true,
-        index: true
+        required: true
     },
     name: {
         type: String,
-        required: true,
-        trim: [true, 'Username is required']
+        required: true
     },
     phoneNo: {
-        type: String,
-        required: [true, 'User phone number required']
+        type: String
     },
     address: {
-        type: String,
-        required: [true, 'please enter address']
+        type: String
     },
     email: {
         type: String,
         required: [true, 'email address is required']
     },
     password: {
-        type: String,
-        maxlength: 12,
-        minlength: 5
+        type: String
     },
-    userType: {
-        devices: [
-            {
-                deviceId: {
-                    type: String,
-                    required: true,
-                    unique: true
-                },
-                label: {
-                    type: String,
-                    trim: true,
-                    default: 'device'
-                },
-                category: {
-                    type: String,
-                    required: true,
-                    default: 'All'
-                },
-                deviceType: {
-                    type: String,
-                    required: true,
-                },
-                location: {
-                    type: String,
-                    required: [true, 'location is required'],
-                    minlength: 12
-                },
-                health: {
-                    type: String,
-                    required: true
-                },
-                configuration: {
-                    type: Boolean,
-                    required: [true, 'configuration is required for check wifi connectivity']
-                },
-                image: {
-                    type: String,
-                    required: true,
-                    default: 'src/images/deafult.png'
-                },
-                alert: {
-                    type: Boolean,
-                    required: true
-                },
-                reports: [
-                    {
-                        reportid: {
-                            type: String,
-                            required: true,
-                            unique: true
-                        },
-                        userId: {
-                            type: String,
-                            unique: true,
-                            required: true
-                        },
-                        deviceId: {
-                            type: String,
-                            required: true
-                        },
-                        type: {
-                            type: String,
-                            required: true
-                        },
-                        detail: {
-                            type: String,
-                            required: true
-                        },
-                        status: {
-                            type: String,
-                            required: true
-                        }
-                    }
-                ]
-            }
-        ],
-        categories: [
-            {
-                type: String,
-                unique: true
-            }
-        ]
+    order:{
+        type:'number',
+        default:0
+    },
+    orderHistory:{
+        type:'array',
+        default:[]
     }
 });
 
-
-module.exports = {user};
+module.exports = User = mongoose.model('users', userSchema);
