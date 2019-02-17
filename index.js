@@ -17,13 +17,17 @@ app.use(
 )
 
 const mongoURI = "mongodb://localhost:27017/FAS";
+var Users = require('./routes/user')
+var Seller = require('./routes/seller')
+
 mongoose
     .connect(mongoURI,{useNewUrlParser:true})
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.log(err))
 
-var Users = require('./routes/user')
+
 app.use('/users',Users)
+app.use('/seller',Seller)
 
 
 app.get('/', (req, res) => {

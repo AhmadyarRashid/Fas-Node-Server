@@ -2,10 +2,6 @@ var mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 var product = new Schema({
-    _id :{
-      type:'String',
-      required: true
-    },
     type:{
         type:'String',
         required: true

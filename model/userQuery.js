@@ -1,24 +1,23 @@
 var mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-var sale = new Schema({
-    _id: {
+var query = new Schema({
+    name: {
         type: 'String',
         required: true
     },
-    userId: {
+    email: {
         type: 'String',
         required: true
     },
-    date: {
+    phoneNo: {
         type: 'String',
-        required: true
+        default: 'none'
     },
-    products: [],
-    amount: {
-        type: 'number',
+    message: {
+        type: 'String',
         required: true
     }
 });
 
-module.exports = sales = mongoose.model('sales', sale);
+module.exports = userQuries = mongoose.model('userQuries', query);

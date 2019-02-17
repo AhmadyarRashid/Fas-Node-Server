@@ -3,6 +3,8 @@ const users = express.Router()
 const cors = require("cors")
 const User = require('../model/user')
 const logins = require('../model/login');
+const products = require('../model/product');
+const userQuries = require('../model/userQuery');
 
 users.use(cors())
 
@@ -112,6 +114,73 @@ users.post('/updateProfile', (req, res) => {
                 res.send({ 'up': 'Some Problem Occur Please Try Again' });
             }
         })
+})
+
+users.post('/getQty', (req, res) => {
+    console.log(req.body);
+    products.aggregate([
+        {
+            $match:
+            {
+                'status': 'Not Sale',
+            }
+        },
+        {
+            $group: {
+                _id: '$type',
+                count: { $sum: 1 }
+            }
+        }
+    ])
+        .then(doc => {
+            if (doc) {
+                res.send({ gq: 'OK', doc: doc })
+            } else {
+                res.send({ gq: 'NO Items Found' });
+            }
+        })
+});
+
+// users.post('/buyProduct', (req, res) => {
+//     // console.log(req.body);
+//     /*
+//         req.body.cart.forEach(item => {
+//             if(item){
+//                 products.find({status:'Not Sale', type:item.type}).limit(item.quantity)
+//                 .then(doc=>{
+//                     console.log(doc,'=========\n');
+//                 }).catch(e => {
+//                     console.log('error');
+//                 });
+//             }
+//             // for (var i = 1; i <= Number(item.quantity); i++) {
+//             //     products.updateOne({status:'Not Sale'}, {$set: {status:'Sale'}}).then(doc=>{
+//             //         if(doc){
+    
+//             //         }
+//             //     })
+//             // }
+//         })
+//         */
+// });
+
+users.post('/contact' , (req,res) => {
+    console.log('=============contact =========' ,req.body);
+    userQuries.create({
+        name: req.body.name,
+        email:req.body.email,
+        phoneNo:req.body.phoneNo,
+        message: req.body.message
+    }).then(doc => {
+        if(doc){
+            console.log('your query submit sucessfully', doc);
+            res.send({'con':'OK'});
+        }else{
+            console.log('some error')
+        }
+    }).catch(e => {
+        console.log(e);
+    })
 })
 
 module.exports = users
