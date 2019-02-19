@@ -75,7 +75,7 @@ const requestAllData = (data) => {
                 db.collection('users').aggregate([
                     {
                         $lookup: {
-                            from: 'smartDevices',
+                            from: 'devices',
                             localField: '_id',
                             foreignField: '_id',
                             as: 'devices'
@@ -117,7 +117,7 @@ const updateLabel = (data) => {
                     assert.equal(null, err);
                 }
                 const db = client.db('FAS');
-                const collection = db.collection('smartDevices');
+                const collection = db.collection('devices');
                 const projId = data['projectId'],
                     deviceId = data['deviceId'],
                     newLabel = data['newLabel'];
@@ -146,7 +146,7 @@ const updateCategory = (data) => {
                     assert.equal(null, err);
                 }
                 const db = client.db('FAS');
-                const collection = db.collection('smartDevices');
+                const collection = db.collection('devices');
                 const projId = data['projectId'],
                     deviceId = data['deviceId'],
                     newCategory = data['changeCat'];
@@ -262,7 +262,7 @@ const resetDevice = (data) => {
                     assert.equal(null, err);
                 }
                 const db = client.db('FAS');
-                const collection = db.collection('smartDevices');
+                const collection = db.collection('devices');
                 projectId = data['projectId'];
                 devlabel = data['label'];
 

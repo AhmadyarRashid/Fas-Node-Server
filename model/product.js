@@ -7,8 +7,8 @@ var product = new Schema({
         required: true
     },
     status: {
-        type: 'String',
-        required: true
+        type: 'boolean',
+        default: false
     }
 });
 

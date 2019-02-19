@@ -3,6 +3,7 @@ const seller = express.Router()
 const cors = require("cors")
 const products = require('../model/product')
 const users = require('../model/user');
+const query = require('../model/userQuery');
 
 seller.use(cors())
 
@@ -12,8 +13,7 @@ seller.post('/addDevice', (req, res) => {
     console.log(req.body);
     for (var i = 0; i < Number(req.body.qty); i++) {
         products.create({
-            type: req.body.type,
-            status: 'Not Sale'
+            type: req.body.type
         }).then(doc => {
             if (i == (Number(req.qty) - 1)) {
                 res.send({ad:'OK'});
@@ -37,5 +37,16 @@ seller.post('/getUser' , (req,res) => {
     })
 });
 
-
+seller.post('/getAllQuery' , (req,res)=> {
+    console.log(req.body);
+    query.find({}).then(doc => {
+        if(doc){
+            res.send({'gaq': 'OK' , doc: doc});
+        }else{
+            res.send({'gaq': 'No Query Exists'});
+        }
+    }).catch(e => {
+        console.log(e);
+    })
+})
 module.exports = seller

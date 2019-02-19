@@ -17,6 +17,10 @@ var query = new Schema({
     message: {
         type: 'String',
         required: true
+    },
+    status:{
+        type:'boolean',
+        default:false
     }
 });
 

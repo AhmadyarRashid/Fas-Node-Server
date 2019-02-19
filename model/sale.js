@@ -2,10 +2,6 @@ var mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 var sale = new Schema({
-    _id: {
-        type: 'String',
-        required: true
-    },
     userId: {
         type: 'String',
         required: true
@@ -14,10 +10,25 @@ var sale = new Schema({
         type: 'String',
         required: true
     },
-    products: [],
+    hub: {
+        type: 'number'
+    },
+    slave:{
+        type: 'number'
+    },
     amount: {
         type: 'number',
         required: true
+    },
+    rating : {
+        type: 'number'
+    },
+    feedback:{
+        type:'String'
+    },
+    status:{
+        type: 'boolean',
+        default: false
     }
 });
 
