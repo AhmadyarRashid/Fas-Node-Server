@@ -77,7 +77,7 @@ const requestAllData = (data) => {
                         $lookup: {
                             from: 'devices',
                             localField: '_id',
-                            foreignField: '_id',
+                            foreignField: 'userId',
                             as: 'devices'
                         }
                     },
@@ -123,7 +123,7 @@ const updateLabel = (data) => {
                     newLabel = data['newLabel'];
 
                 const res = collection.updateOne(
-                    { "_id": projId, "devices.deviceId": deviceId },
+                    { "userId": projId, "devices._id": deviceId },
                     {
                         $set: { "devices.$.label": newLabel }
                     }
@@ -153,7 +153,7 @@ const updateCategory = (data) => {
 
 
                 const res = collection.updateOne(
-                    { "_id": projId, "devices.deviceId": deviceId },
+                    { "userId": projId, "devices._id": deviceId },
                     {
                         $set: { "devices.$.category": newCategory }
                     }
@@ -267,7 +267,7 @@ const resetDevice = (data) => {
                 devlabel = data['label'];
 
                 const res = collection.updateOne(
-                    { "_id": projectId, "devices.label": devlabel },
+                    { "userId": projectId, "devices.label": devlabel },
                     {
                         $set: { "devices.$.configuration": 'false' }
                     }

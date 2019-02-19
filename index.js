@@ -156,7 +156,8 @@ io.on('connection', (socket) => {
         console.log('-- first time get data ----', data);
         db.requestAllData(data).then((res) => {
             if (res) {
-                // console.log('=================\n' , res);
+                console.log('========   FIRST TIME GET DATA =========\n' , JSON.stringify(res,null,2) );
+                
                 io.emit('SendAllDataFT' + data['uniqueId'], res);
             }
         }).catch((err) => {
