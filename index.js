@@ -12,7 +12,7 @@ app.use(bodyParser.json())
 app.use(cors())
 app.use(
     bodyParser.urlencoded({
-        extended:false
+        extended: false
     })
 )
 
@@ -21,13 +21,13 @@ var Users = require('./routes/user')
 var Seller = require('./routes/seller')
 
 mongoose
-    .connect(mongoURI,{useNewUrlParser:true})
+    .connect(mongoURI, { useNewUrlParser: true })
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.log(err))
 
 
-app.use('/users',Users)
-app.use('/seller',Seller)
+app.use('/users', Users)
+app.use('/seller', Seller)
 
 
 app.get('/', (req, res) => {
@@ -156,8 +156,8 @@ io.on('connection', (socket) => {
         console.log('-- first time get data ----', data);
         db.requestAllData(data).then((res) => {
             if (res) {
-                console.log('========   FIRST TIME GET DATA =========\n' , JSON.stringify(res,null,2) );
-                
+                console.log('========   FIRST TIME GET DATA =========\n', JSON.stringify(res, null, 2));
+
                 io.emit('SendAllDataFT' + data['uniqueId'], res);
             }
         }).catch((err) => {
@@ -171,7 +171,7 @@ io.on('connection', (socket) => {
         console.log('------------------- refresh data event trigger ---------------');
         db.requestAllData(data).then((res) => {
             if (res) {
-                //  console.log(JSON.stringify(res, null, 4));
+                console.log(JSON.stringify(res, null, 4));
                 io.emit('InformRefreshData' + data['uniqueId'] + data['projectId'], res);
             }
         }).catch((err) => {

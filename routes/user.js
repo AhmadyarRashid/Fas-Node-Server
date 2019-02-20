@@ -7,6 +7,7 @@ const products = require('../model/product');
 const userQuries = require('../model/userQuery');
 const device = require('../model/device');
 const sales = require('../model/sale');
+const category = require('../model/category');
 
 users.use(cors())
 
@@ -38,6 +39,29 @@ users.post('/register', (req, res) => {
                         console.log(e);
                     });
 
+                 category.create({ _id: logindoc._id })
+                    .then(res => {
+                        console.log(res);
+                        category.updateOne(
+                            { _id: logindoc._id },
+                            {
+                                $push: {
+                                    categories: 'ALL'
+                                }
+                            }
+                        ).then(r => {
+                            console.log('===== push sucess ==',r);
+
+                        }).catch(e => {
+                            console.log(e);
+                        })
+                    })
+                    .catch(e => {
+                        console.log(e)
+                    })
+
+
+
 
                 const NewUser = {
                     _id: logindoc._id,
@@ -48,6 +72,8 @@ users.post('/register', (req, res) => {
                     password: req.body.password
                 }
                 User.create(NewUser).then(userdoc => {
+
+
                     res.send({
                         'reg': 'OK',
                         res: userdoc
@@ -138,12 +164,13 @@ users.post('/updateProfile', (req, res) => {
 })
 
 users.post('/getQty', (req, res) => {
+    console.log('=========== get qty function ================');
     console.log(req.body);
     products.aggregate([
         {
             $match:
             {
-                'status': 'Not Sale',
+                'status': false,
             }
         },
         {
@@ -161,8 +188,6 @@ users.post('/getQty', (req, res) => {
             }
         })
 });
-
-
 
 users.post('/contact', (req, res) => {
     console.log('=============contact =========', req.body);
@@ -227,14 +252,14 @@ users.post('/buyProduct', (req, res) => {
                                     }
                                 })
                                 .catch(e => {
-                                    res.send({'bp': 'Failed'});
+                                    res.send({ 'bp': 'Failed' });
                                     console.log(e);
                                 })
                             console.log(res);
                         }
                     })
                     .catch(e => {
-                        res.send({'bp': 'Failed'});
+                        res.send({ 'bp': 'Failed' });
                         console.log(e);
                     })
 
@@ -247,7 +272,7 @@ users.post('/buyProduct', (req, res) => {
                         if (res) {
                             res.forEach(p => {
                                 devId = p._id
-                            
+
                                 var dev = {
                                     _id: devId,
                                     label: 'HUB',
@@ -261,7 +286,7 @@ users.post('/buyProduct', (req, res) => {
                                 ).then(res => {
                                     console.log(res);
                                 }).catch(e => {
-                                    res.send({'bp': 'Failed'});
+                                    res.send({ 'bp': 'Failed' });
                                     console.log(e);
                                 })
 
@@ -274,7 +299,7 @@ users.post('/buyProduct', (req, res) => {
                                         console.log(res);
                                     }
                                 }).catch(e => {
-                                    res.send({'bp': 'Failed'});
+                                    res.send({ 'bp': 'Failed' });
                                     console.log(e);
                                 })
 
@@ -284,7 +309,7 @@ users.post('/buyProduct', (req, res) => {
 
                     })
                     .catch(e => {
-                        res.send({'bp': 'Failed'});
+                        res.send({ 'bp': 'Failed' });
                         console.log(e);
                     })
 
@@ -297,7 +322,7 @@ users.post('/buyProduct', (req, res) => {
                         if (res) {
                             res.forEach(i => {
                                 devId = i._id
-                               
+
                                 var dev = {
                                     _id: devId,
                                     label: 'SLAVE',
@@ -311,7 +336,7 @@ users.post('/buyProduct', (req, res) => {
                                 ).then(res => {
                                     console.log(res);
                                 }).catch(e => {
-                                    res.send({'bp': 'Failed'});
+                                    res.send({ 'bp': 'Failed' });
                                     console.log(e);
                                 })
 
@@ -329,7 +354,7 @@ users.post('/buyProduct', (req, res) => {
                                         }
                                     })
                                     .catch(e => {
-                                        res.send({'bp': 'Failed'});
+                                        res.send({ 'bp': 'Failed' });
                                         console.log(e);
                                     })
 
@@ -339,12 +364,12 @@ users.post('/buyProduct', (req, res) => {
 
                         }
                     }).catch(e => {
-                        res.send({'bp': 'Failed'});
+                        res.send({ 'bp': 'Failed' });
                         console.log(e);
                     });
 
 
-                    res.send({'bp': 'OK'});
+                res.send({ 'bp': 'OK' });
 
             }
         })

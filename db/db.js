@@ -61,6 +61,7 @@ const loginConfirm = (data) => {
 };
 
 const requestAllData = (data) => {
+    console.log(data);
     return new Promise((resolve, reject) => {
         setTimeout(() => {
             // console.log('-----------------inside request all data--------------');
@@ -74,6 +75,11 @@ const requestAllData = (data) => {
                 // console.log('before query ===');
                 db.collection('users').aggregate([
                     {
+                        $match : {
+                            userId: data.projId
+                        }
+                    },
+                    {
                         $lookup: {
                             from: 'devices',
                             localField: '_id',
@@ -83,7 +89,7 @@ const requestAllData = (data) => {
                     },
                     {
                         $lookup: {
-                            from: 'category',
+                            from: 'categories',
                             localField: '_id',
                             foreignField: '_id',
                             as: 'categories'
@@ -176,7 +182,7 @@ const addNewCategory = (data) => {
                     assert.equal(null, err);
                 }
                 const db = client.db('FAS');
-                const collection = db.collection('category');
+                const collection = db.collection('categories');
                 const projId = data['projectId'],
                     newCat = data['newCat'];
 
@@ -203,7 +209,7 @@ const deleteCategory = (data) => {
                     assert.equal(null, err);
                 }
                 const db = client.db('FAS');
-                const collection = db.collection('category');
+                const collection = db.collection('categories');
                 const projId = data['projectId'],
                     delCat = data['delCat'];
 
