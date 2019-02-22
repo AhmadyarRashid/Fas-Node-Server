@@ -376,4 +376,27 @@ users.post('/buyProduct', (req, res) => {
 
 });
 
+users.post('/myorders' , (req,res) => {
+    console.log(req.body);
+
+    sales.find({
+        userId: req.body.userId,
+        status: false
+    }).then(doc => {
+        if(doc){
+            console.log(doc);
+            res.send({
+                guo : 'OK',
+                doc:doc
+            })
+        }else{
+            res.send({
+                guo : 'No Pending Order'
+            })
+        }
+    }).catch(e => {
+        console.log(e);
+    })
+})
+
 module.exports = users

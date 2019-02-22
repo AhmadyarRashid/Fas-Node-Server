@@ -77,50 +77,103 @@ seller.post('/getSummary', (req, res) => {
             }
 
             products.countDocuments({ type: 'HUB', status: false })
-            .then(hubC => {
-                if (hubC) {
-                    totalHubs = hubC;
+                .then(hubC => {
+                    if (hubC) {
+                        totalHubs = hubC;
 
-                }
-                else {
-                    console.log('======= no hub availables')
-                }
-
-                
-                products.countDocuments({ type: 'SLAVE', status: false })
-                .then(slaveC => {
-                    if (slaveC) {
-                        totalSlaves = slaveC
                     }
                     else {
-                        console.log(' =========  no slave available ====')
+                        console.log('======= no hub availables')
                     }
 
-                    sales.countDocuments({})
-                    .then(salesC => {
-                        if (salesC) {
-                            totalSales = salesC
-                        } else {
-                            console.log('======= no sale availables==');
-                        }
-                        res.send({
-                            gs : 'OK',
-                            hub: totalHubs,
-                            slave: totalSlaves,
-                            user: totalCustomer,
-                            sale: totalSales
-                        })
 
-                        console.log('total User ====' , totalCustomer,
-                        '\n=========== total hubs====', totalHubs,
-                        '\n======= total slaves=====' , totalSlaves,
-                        '\n======== sales =========' , totalSales);
-                    })
+                    products.countDocuments({ type: 'SLAVE', status: false })
+                        .then(slaveC => {
+                            if (slaveC) {
+                                totalSlaves = slaveC
+                            }
+                            else {
+                                console.log(' =========  no slave available ====')
+                            }
+
+                            sales.countDocuments({})
+                                .then(salesC => {
+                                    if (salesC) {
+                                        totalSales = salesC
+                                    } else {
+                                        console.log('======= no sale availables==');
+                                    }
+                                    res.send({
+                                        gs: 'OK',
+                                        hub: totalHubs,
+                                        slave: totalSlaves,
+                                        user: totalCustomer,
+                                        sale: totalSales
+                                    })
+
+                                    console.log('total User ====', totalCustomer,
+                                        '\n=========== total hubs====', totalHubs,
+                                        '\n======= total slaves=====', totalSlaves,
+                                        '\n======== sales =========', totalSales);
+                                })
+                        })
                 })
-            })
 
         })
 });
+
+seller.post('/getSales', (req, res) => {
+    console.log(req.body);
+
+    sales.aggregate([
+        {
+            $lookup: {
+                from: 'users',
+                localField: 'userId',
+                foreignField: '_id',
+                as: 'salesDetails'
+            }
+        }
+    ])
+        .then(doc => {
+            if (doc) {
+                //console.log('======== joins ===== \n', JSON.stringify(doc, null, 2));
+                sendlist = []
+                doc.forEach((sale, index) => {
+                    let s = {
+                        _id : sale._id,
+                        date: sale.date,
+                        hub: sale.hub,
+                        slave: sale.slave,
+                        amount: sale.amount,
+                        status: sale.status,
+                        userName: sale.salesDetails[0].name,
+                        email: sale.salesDetails[0].email
+                    }
+                    sendlist.push(s);
+
+                    if (doc.length == index - 1) {
+
+                    }
+                })
+
+                console.log('=============================NEW RES==========================');
+                console.log(JSON.stringify(sendlist, null, 2));
+                setTimeout(() => {
+                    res.send({ gs: 'OK', doc: sendlist })
+                },0);
+               
+
+            } else {
+                res.send({ gs: 'No Sales Founds' });
+                console.log('no sales founds');
+            }
+        })
+        .catch(e => {
+            console.log(e);
+        })
+
+})
 
 
 module.exports = seller

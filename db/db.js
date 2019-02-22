@@ -1,5 +1,8 @@
 const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
+const user = require('../model/user')
+const device = require('../model/device');
+const category = require('../model/category');
 
 const loginValidate = (data) => {
     return new Promise((resolve, reject) => {
@@ -65,20 +68,49 @@ const requestAllData = (data) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
             // console.log('-----------------inside request all data--------------');
+
+
+            // user.findOne({
+            //     _id: data.projectId
+            // }).then(udoc => {
+            //     //console.log('======== userData =======' , udoc);
+            //     if(udoc){
+            //         userData = udoc
+            //         console.log('======== userData =======' , userData);
+            //         device.findOne({
+            //             userId: data.projectId
+            //         }).then(ddoc => {
+            //             if(ddoc){
+            //                 userData['devices'] = ddoc
+
+            //                 console.log('======== devices =======' , userData);
+            //                 category.findOne({
+            //                     _id: data.projectId
+            //                 }).then(cdoc => {
+            //                     if(cdoc){
+            //                         userData['categories'] = cdoc
+            //                         console.log('======== category =======' , userData);
+            //                        resolve(userData)
+            //                     }
+            //                 })
+            //             }
+            //         })
+            //     }
+            // })
+
+
+
+      
             var client = new MongoClient('mongodb://localhost:27017', { useNewUrlParser: true });
             client.connect(function (err) {
                 if (err) {
                     reject('db connection error');
                     assert.equal(null, err);
                 }
+
                 const db = client.db('FAS');
                 // console.log('before query ===');
                 db.collection('users').aggregate([
-                    {
-                        $match : {
-                            userId: data.projId
-                        }
-                    },
                     {
                         $lookup: {
                             from: 'devices',
@@ -95,6 +127,8 @@ const requestAllData = (data) => {
                             as: 'categories'
                         }
                     }
+
+
                 ]).toArray((err, res) => {
                     if (err) {
                         //console.log('found err = ', err);
@@ -105,9 +139,12 @@ const requestAllData = (data) => {
 
                     }
                 });
-            });
 
-            client.close();
+
+            });
+          
+
+          //  client.close();
 
         }, 0);
     });
@@ -300,15 +337,15 @@ const confirmationEmail = (data) => {
                 const db = client.db('FAS');
                 const collection = db.collection('logins');
                 email = data['email'];
-                
-                collection.findOne({ email : email}).then(res => {
-                    if(res){
+
+                collection.findOne({ email: email }).then(res => {
+                    if (res) {
                         resolve('true');
-                    }else{
+                    } else {
                         resolve('false');
                     }
                 }).catch(err => {
-                    if(err){
+                    if (err) {
                         reject(err);
                     }
                 });

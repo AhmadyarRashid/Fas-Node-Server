@@ -21,10 +21,12 @@ var sale = new Schema({
         required: true
     },
     rating : {
-        type: 'number'
+        type: 'number',
+        default:0
     },
     feedback:{
-        type:'String'
+        type:'String',
+        default:''
     },
     status:{
         type: 'boolean',
