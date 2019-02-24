@@ -39,7 +39,7 @@ users.post('/register', (req, res) => {
                         console.log(e);
                     });
 
-                 category.create({ _id: logindoc._id })
+                category.create({ _id: logindoc._id })
                     .then(res => {
                         console.log(res);
                         category.updateOne(
@@ -50,7 +50,7 @@ users.post('/register', (req, res) => {
                                 }
                             }
                         ).then(r => {
-                            console.log('===== push sucess ==',r);
+                            console.log('===== push sucess ==', r);
 
                         }).catch(e => {
                             console.log(e);
@@ -376,22 +376,67 @@ users.post('/buyProduct', (req, res) => {
 
 });
 
-users.post('/myorders' , (req,res) => {
+users.post('/myorders', (req, res) => {
     console.log(req.body);
 
     sales.find({
         userId: req.body.userId,
         status: false
     }).then(doc => {
-        if(doc){
+        if (doc) {
             console.log(doc);
             res.send({
-                guo : 'OK',
-                doc:doc
+                guo: 'OK',
+                doc: doc
+            })
+        } else {
+            res.send({
+                guo: 'No Pending Order'
+            })
+        }
+    }).catch(e => {
+        console.log(e);
+    })
+})
+
+users.post('/receivedOrder', (req, res) => {
+    console.log(req.body);
+
+    sales.updateOne({
+        _id: req.body.id
+    }, {
+           $set: {
+               status: true
+           }
+        }).then(doc => {
+            if (doc) {
+                console.log(res);
+                res.send({ ro: 'OK' })
+            } else {
+                res.send({
+                    ro: 'some error found'
+                })
+            }
+        }).catch(e => {
+            console.log(e);
+        })
+})
+
+users.post('/orderFeedBack' , (req,res) => {
+    console.log(req.body);
+    sales.updateOne({
+        _id : req.body.id
+    }, {
+        rating: req.body.rating,
+        feedback: req.body.feedback
+    }).then(doc => {
+        if(doc) {
+            res.send({
+                of : 'OK'
             })
         }else{
             res.send({
-                guo : 'No Pending Order'
+                of : 'No data found'
             })
         }
     }).catch(e => {
