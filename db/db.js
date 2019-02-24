@@ -3,6 +3,7 @@ const assert = require('assert');
 const user = require('../model/user')
 const device = require('../model/device');
 const category = require('../model/category');
+const logins = require('../model/login');
 
 const loginValidate = (data) => {
     return new Promise((resolve, reject) => {
@@ -67,84 +68,90 @@ const requestAllData = (data) => {
     console.log(data);
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            // console.log('-----------------inside request all data--------------');
+            console.log('-----------------inside request all data--------------');
 
+            let userData = []
+            user.findOne({
+                _id: data.projectId
+            }).then(udoc => {
+                if (udoc) {
+                    userData.push(udoc)
+                   // console.log('======== userData =======', userData);
+                    device.findOne({
+                        userId: data.projectId
+                    }).then(ddoc => {
+                        if (ddoc) {
 
-            // user.findOne({
-            //     _id: data.projectId
-            // }).then(udoc => {
-            //     //console.log('======== userData =======' , udoc);
-            //     if(udoc){
-            //         userData = udoc
-            //         console.log('======== userData =======' , userData);
-            //         device.findOne({
-            //             userId: data.projectId
-            //         }).then(ddoc => {
-            //             if(ddoc){
-            //                 userData['devices'] = ddoc
+                            //console.log('=========== devices ==========\n' , ddoc);
+                           
+                            userData.push(ddoc)
 
-            //                 console.log('======== devices =======' , userData);
-            //                 category.findOne({
-            //                     _id: data.projectId
-            //                 }).then(cdoc => {
-            //                     if(cdoc){
-            //                         userData['categories'] = cdoc
-            //                         console.log('======== category =======' , userData);
-            //                        resolve(userData)
-            //                     }
-            //                 })
-            //             }
-            //         })
-            //     }
-            // })
-
-
-
-      
-            var client = new MongoClient('mongodb://localhost:27017', { useNewUrlParser: true });
-            client.connect(function (err) {
-                if (err) {
-                    reject('db connection error');
-                    assert.equal(null, err);
+                            //console.log('======== devices =======', JSON.stringify(userData, null , 2));
+                            category.findOne({
+                                _id: data.projectId
+                            }).then(cdoc => {
+                                if (cdoc) {
+                                    //console.log('============== category ========\n' , cdoc);
+                                    userData.push(cdoc)
+                                   // console.log('======== over all category =======\n', JSON.stringify(userData, null , 2));
+                                    resolve(userData)
+                                }
+                            })
+                        }
+                    })
                 }
-
-                const db = client.db('FAS');
-                // console.log('before query ===');
-                db.collection('users').aggregate([
-                    {
-                        $lookup: {
-                            from: 'devices',
-                            localField: '_id',
-                            foreignField: 'userId',
-                            as: 'devices'
-                        }
-                    },
-                    {
-                        $lookup: {
-                            from: 'categories',
-                            localField: '_id',
-                            foreignField: '_id',
-                            as: 'categories'
-                        }
-                    }
+            })
 
 
-                ]).toArray((err, res) => {
-                    if (err) {
-                        //console.log('found err = ', err);
-                        reject(err);
-                    } else {
-                        //  console.log('found data = ', res);
-                        resolve(res);
 
-                    }
-                });
+            /*
+         
+               var client = new MongoClient('mongodb://localhost:27017', { useNewUrlParser: true });
+               client.connect(function (err) {
+                   if (err) {
+                       reject('db connection error');
+                       assert.equal(null, err);
+                   }
+   
+                   const db = client.db('FAS');
+                  
+                   db.collection('users').aggregate([
+                       {
+                           $lookup: {
+                               from: 'devices',
+                               localField: '_id',
+                               foreignField: 'userId',
+                               as: 'devices'
+                           }
+                       },
+                       {
+                           $lookup: {
+                               from: 'categories',
+                               localField: '_id',
+                               foreignField: '_id',
+                               as: 'categories'
+                           }
+                       }
+   
+   
+                   ]).toArray((err, res) => {
+                       if (err) {
+                           //console.log('found err = ', err);
+                           reject(err);
+                       } else {
+                           //  console.log('found data = ', res);
+                           resolve(res);
+   
+                       }
+                   });
+   
+   
+               });
+   
+               */
 
 
-            });
-          
-
-          //  client.close();
+            //  client.close();
 
         }, 0);
     });
@@ -265,6 +272,28 @@ const deleteCategory = (data) => {
 const changePassword = (data) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
+            
+            logins.findOne({
+                email: data['email'],
+                _id: data['projectId']
+            }).then(doc => {
+                if (doc) {
+                    logins.updateOne({ email: data['email'], _id: data['projectId'] }, { $set: { password: data['newPass'] } })
+                        .then(result => {
+                            if (result) {
+                                resolve(result);
+                            } else {
+                                reject('no data found');
+                            }
+                        }).catch(e => {
+                            console.log(e);
+                        })
+                } else {
+                   reject('old password is wrong');
+                }
+            })
+
+            /*
             const client = new MongoClient('mongodb://localhost:27017', { useNewUrlParser: true });
             client.connect(function (err) {
                 if (err) {
@@ -291,6 +320,7 @@ const changePassword = (data) => {
 
             });
             client.close();
+            */
         }, 100);
     });
 };
