@@ -76,14 +76,14 @@ const requestAllData = (data) => {
             }).then(udoc => {
                 if (udoc) {
                     userData.push(udoc)
-                   // console.log('======== userData =======', userData);
+                    // console.log('======== userData =======', userData);
                     device.findOne({
                         userId: data.projectId
                     }).then(ddoc => {
                         if (ddoc) {
 
                             //console.log('=========== devices ==========\n' , ddoc);
-                           
+
                             userData.push(ddoc)
 
                             //console.log('======== devices =======', JSON.stringify(userData, null , 2));
@@ -93,7 +93,7 @@ const requestAllData = (data) => {
                                 if (cdoc) {
                                     //console.log('============== category ========\n' , cdoc);
                                     userData.push(cdoc)
-                                   // console.log('======== over all category =======\n', JSON.stringify(userData, null , 2));
+                                    // console.log('======== over all category =======\n', JSON.stringify(userData, null , 2));
                                     resolve(userData)
                                 }
                             })
@@ -230,7 +230,7 @@ const addNewCategory = (data) => {
                 const projId = data['projectId'],
                     newCat = data['newCat'];
 
-                var res = collection.update(
+                var res = collection.updateOne(
                     { "_id": projId },
                     { $addToSet: { categories: newCat } }
                 );
@@ -257,7 +257,7 @@ const deleteCategory = (data) => {
                 const projId = data['projectId'],
                     delCat = data['delCat'];
 
-                var res = collection.update(
+                var res = collection.updateOne(
                     { "_id": projId },
                     { $pull: { categories: delCat } }
                 );
@@ -272,7 +272,7 @@ const deleteCategory = (data) => {
 const changePassword = (data) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            
+
             logins.findOne({
                 email: data['email'],
                 _id: data['projectId']
@@ -289,7 +289,7 @@ const changePassword = (data) => {
                             console.log(e);
                         })
                 } else {
-                   reject('old password is wrong');
+                    reject('old password is wrong');
                 }
             })
 
@@ -388,6 +388,66 @@ const confirmationEmail = (data) => {
     })
 }
 
+const changeLocation = (data) => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            let projId = data['projectId'],
+                deviceId = data['deviceId'],
+                location = data['newLocation'],
+                category = data['category'];
+
+            device.updateOne(
+                { "userId": projId, "devices._id": deviceId },
+                {
+                    $set: { "devices.$.location": location }
+                }
+            ).then(doc => {
+                if (doc) {
+                    resolve({
+                        result: 'OK',
+                        projectId: projId,
+                        deviceId: deviceId,
+                        location: location,
+                        category: category
+                    })
+                } else {
+                    reject({
+                        result: 'failed'
+                    })
+                }
+            }).catch(e => {
+                reject({
+                    result: 'failed'
+                })
+            })
+        }, 0);
+    })
+}
+
+const configuration = (data) => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            let projId = data['projectId'],
+                deviceId = data['deviceId'],
+                location = data['configuration'];
+
+            device.updateOne(
+                { "userId": projId, "devices._id": deviceId },
+                {
+                    $set: { "devices.$.configuration": true }
+                }
+            ).then(doc => {
+                if(doc){
+                    console.log('configure sucessfully');
+                }
+            }).catch(e => {
+                console.log(e);
+            })
+
+        }, 0);
+    })
+}
+
 module.exports = {
     loginValidate,
     loginConfirm,
@@ -398,5 +458,7 @@ module.exports = {
     deleteCategory,
     changePassword,
     resetDevice,
-    confirmationEmail
+    confirmationEmail,
+    changeLocation,
+    configuration
 };

@@ -156,7 +156,7 @@ io.on('connection', (socket) => {
         console.log('-- first time get data ----', data);
         db.requestAllData(data).then((res) => {
             if (res) {
-                console.log('========   FIRST TIME GET DATA =========\n', JSON.stringify(res, null, 2));
+                //console.log('========   FIRST TIME GET DATA =========\n', JSON.stringify(res, null, 2));
 
                 io.emit('SendAllDataFT' + data['uniqueId'], res);
             }
@@ -191,13 +191,18 @@ io.on('connection', (socket) => {
             io.emit('InformChangeLabel' + data['projectId'], data);
             console.log(err);
         });
-
     });
 
     socket.on('resetDevice', (data) => {
         console.log('-------------------Reset Device---------------------', data);
         db.resetDevice(data).then((doc) => {
             console.log('reset Device Sucessfully');
+            //console.log(doc);
+            io.emit('InformResetDevice' + data['projectId'], {
+                projectId: data['projectId'],
+                label: data['label'],
+                reset: 'OK'
+            });
         }).catch((err) => {
             console.log('error occur in reset Device', err);
         })
@@ -273,7 +278,29 @@ io.on('connection', (socket) => {
         }).catch(e => {
             io.emit('InformConfirmEmail' + data['uniqueId'], 'error');
         });
+    })
 
+    socket.on('changeLocation', (data) => {
+        console.log('------- location change ------', data['projectId'], data['deviceId'], data['newLocation']);
+
+        db.changeLocation(data).then(res => {
+            if (res) {
+                io.emit('InformChangeLocation' + data['projectId'], res);
+            }
+        }).catch(e => {
+            io.emit('InformChangeLocation' + data['projectId'], e);
+        })
+    });
+
+    socket.on('configureDevice' , data => {
+        console.log('----------- configure device --------------', data);
+        db.configuration(data).then(res => {
+            if(res){
+                console.log('configuration sucessfully');
+            }
+        }).catch(e => {
+            console.log('some error exists');
+        })
     })
 
     socket.on('disconnect', () => {
