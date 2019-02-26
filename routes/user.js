@@ -8,6 +8,7 @@ const userQuries = require('../model/userQuery');
 const device = require('../model/device');
 const sales = require('../model/sale');
 const category = require('../model/category');
+const nodemailer = require('nodemailer');
 
 users.use(cors())
 
@@ -200,6 +201,37 @@ users.post('/contact', (req, res) => {
         if (doc) {
             console.log('your query submit sucessfully', doc);
             res.send({ 'con': 'OK' });
+
+            senderEmail = req.body.email
+
+
+            var transporter = nodemailer.createTransport({
+                service: 'gmail',
+                host: 'smtp.gmail.com',
+                port: 465,
+                secure: true,
+                auth: {
+                    user: 'ahmedyar61@gmail.com',
+                    pass: 'Maaz786786786'
+                }
+            });
+
+            var mailOptions = {
+                from: 'ahmedyar61@gmail.com',
+                to: senderEmail,
+                subject: 'Smart Fire Alarm System',
+                text: 'Your message have been recieved. we will contact you as soon as possible'
+            };
+
+            transporter.sendMail(mailOptions, function (error, info) {
+                if (error) {
+                    console.log(error);
+                } else {
+                    console.log('Email sent: ' + info.response);
+                }
+            });
+
+
         } else {
             console.log('some error')
         }
@@ -236,6 +268,36 @@ users.post('/buyProduct', (req, res) => {
 
                             saleId = res._id
                             console.log('====================Sale Id ==============\n', saleId, '\n =====================');
+
+                            senderEmail = req.body.email
+                            date = new Date()
+                            var transporter = nodemailer.createTransport({
+                                service: 'gmail',
+                                host: 'smtp.gmail.com',
+                                port: 465,
+                                secure: true,
+                                auth: {
+                                    user: 'ahmedyar61@gmail.com',
+                                    pass: 'Maaz786786786'
+                                }
+                            });
+
+                            var mailOptions = {
+                                from: 'ahmedyar61@gmail.com',
+                                to: senderEmail,
+                                subject: 'Smart Fire Alarm System',
+                                text: `Your order number # ${res._id} has been placed ${date} via Cash on Delivery. You will be updated with another email after your items have been shipped`
+                            };
+
+                            transporter.sendMail(mailOptions, function (error, info) {
+                                if (error) {
+                                    console.log(error);
+                                } else {
+                                    console.log('Email sent: ' + info.response);
+                                }
+                            });
+
+
 
                             User.updateOne({
                                 _id: userId
@@ -369,7 +431,13 @@ users.post('/buyProduct', (req, res) => {
                     });
 
 
-                res.send({ 'bp': 'OK' });
+
+
+                setTimeout(() => {
+                    res.send({ 'bp': 'OK', saleId });
+
+                }, 0);
+
 
             }
         })
@@ -405,9 +473,9 @@ users.post('/receivedOrder', (req, res) => {
     sales.updateOne({
         _id: req.body.id
     }, {
-           $set: {
-               status: true
-           }
+            $set: {
+                status: true
+            }
         }).then(doc => {
             if (doc) {
                 console.log(res);
@@ -422,26 +490,26 @@ users.post('/receivedOrder', (req, res) => {
         })
 })
 
-users.post('/orderFeedBack' , (req,res) => {
+users.post('/orderFeedBack', (req, res) => {
     console.log(req.body);
     sales.updateOne({
-        _id : req.body.id
+        _id: req.body.id
     }, {
-        rating: req.body.rating,
-        feedback: req.body.feedback
-    }).then(doc => {
-        if(doc) {
-            res.send({
-                of : 'OK'
-            })
-        }else{
-            res.send({
-                of : 'No data found'
-            })
-        }
-    }).catch(e => {
-        console.log(e);
-    })
+            rating: req.body.rating,
+            feedback: req.body.feedback
+        }).then(doc => {
+            if (doc) {
+                res.send({
+                    of: 'OK'
+                })
+            } else {
+                res.send({
+                    of: 'No data found'
+                })
+            }
+        }).catch(e => {
+            console.log(e);
+        })
 })
 
 module.exports = users

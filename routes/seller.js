@@ -5,7 +5,7 @@ const products = require('../model/product')
 const users = require('../model/user');
 const query = require('../model/userQuery');
 const sales = require('../model/sale');
-
+const nodemailer = require('nodemailer');
 
 seller.use(cors())
 
@@ -141,7 +141,7 @@ seller.post('/getSales', (req, res) => {
                 sendlist = []
                 doc.forEach((sale, index) => {
                     let s = {
-                        _id : sale._id,
+                        _id: sale._id,
                         date: sale.date,
                         hub: sale.hub,
                         slave: sale.slave,
@@ -161,8 +161,8 @@ seller.post('/getSales', (req, res) => {
                 console.log(JSON.stringify(sendlist, null, 2));
                 setTimeout(() => {
                     res.send({ gs: 'OK', doc: sendlist })
-                },0);
-               
+                }, 0);
+
 
             } else {
                 res.send({ gs: 'No Sales Founds' });
@@ -173,6 +173,57 @@ seller.post('/getSales', (req, res) => {
             console.log(e);
         })
 
+})
+
+seller.post('/sendReply', (req, res) => {
+    console.log(req.body);
+
+    id = req.body.id;
+    name = req.body.name;
+    email = req.body.email;
+    message = req.body.message;
+    replySms = req.body.replySms;
+
+
+    query.updateOne(
+        {_id : id},
+        {status: true}
+    ).then(doc => {
+        if(doc){
+            res.send({sr: 'OK'});
+        }
+    }).catch(e => {
+        res.send({sr: 'failed'});
+    })
+
+    var transporter = nodemailer.createTransport({
+        service: 'gmail',
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true,
+        auth: {
+            user: 'ahmedyar61@gmail.com',
+            pass: 'Maaz786786786'
+        }
+    });
+
+    var mailOptions = {
+        from: 'ahmedyar61@gmail.com',
+        to: email,
+        subject: 'Smart Fire Alarm System',
+        text: `Dear ${name} \n Your Query : ${message} \n ${replySms}`
+    };
+
+    transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+            console.log(error);
+        } else {
+            console.log('Email sent: ' + info.response);
+            res.send({sr: 'OK'});
+        }
+    });
+
+   
 })
 
 
