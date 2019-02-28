@@ -6,6 +6,7 @@ const users = require('../model/user');
 const query = require('../model/userQuery');
 const sales = require('../model/sale');
 const nodemailer = require('nodemailer');
+const adminLogin = require('../model/adminLogin');
 
 seller.use(cors())
 
@@ -186,14 +187,14 @@ seller.post('/sendReply', (req, res) => {
 
 
     query.updateOne(
-        {_id : id},
-        {status: true}
+        { _id: id },
+        { status: true }
     ).then(doc => {
-        if(doc){
-            res.send({sr: 'OK'});
+        if (doc) {
+            res.send({ sr: 'OK' });
         }
     }).catch(e => {
-        res.send({sr: 'failed'});
+        res.send({ sr: 'failed' });
     })
 
     var transporter = nodemailer.createTransport({
@@ -219,12 +220,59 @@ seller.post('/sendReply', (req, res) => {
             console.log(error);
         } else {
             console.log('Email sent: ' + info.response);
-            res.send({sr: 'OK'});
+            res.send({ sr: 'OK' });
         }
     });
 
-   
+
 })
+
+seller.post('/login', (req, res) => {
+    console.log(req.body);
+    adminLogin.findOne({
+        email: req.body.email,
+        password: req.body.password
+    }).then(doc => {
+        if (doc) {
+            res.send({ al: 'OK' });
+        } else {
+            res.send({ al: 'notFound' });
+        }
+    }).catch(e => {
+        res.send({ al: 'failed' });
+    })
+});
+
+seller.post('/changePass', (req, res) => {
+    console.log(req.body);
+    adminLogin.updateOne(
+        { email: req.body.email, password: req.body.oldPass },
+        { password: req.body.newPass }
+    ).then(doc => {
+        if(doc){
+            console.log('doc found', doc)
+            if(doc.nModified > 0){
+                res.send({
+                    acp: 'OK'
+                })  
+            }else{
+                res.send({
+                    acp: 'OldPassWrong'
+                })
+            }
+            
+        }else{
+            console.log('no doc found')
+            res.send({
+                acp: 'OldPassWrong'
+            })
+        }
+    }).catch(e => {
+        res.send({
+            acp : 'SNP'
+        })
+    })
+});
 
 
 module.exports = seller
