@@ -7,6 +7,7 @@ const query = require('../model/userQuery');
 const sales = require('../model/sale');
 const nodemailer = require('nodemailer');
 const adminLogin = require('../model/adminLogin');
+const report = require('../model/report');
 
 seller.use(cors())
 
@@ -273,6 +274,20 @@ seller.post('/changePass', (req, res) => {
         })
     })
 });
+
+seller.post('/getReports' , (req, res) => {
+    console.log(req.body);
+    report.find({}).then(doc => {
+        if(doc){
+            res.send({gr: 'OK' , doc: doc});
+        }else{
+            res.send({gr: 'noData'});
+        }
+    }).catch(e => {
+        console.log(e);
+        res.send({gr: 'failed'});
+    })
+})
 
 
 module.exports = seller

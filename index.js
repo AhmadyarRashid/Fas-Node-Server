@@ -20,6 +20,7 @@ const mongoURI = "mongodb://localhost:27017/FAS";
 var Users = require('./routes/user')
 var Seller = require('./routes/seller')
 
+
 mongoose
     .connect(mongoURI, { useNewUrlParser: true })
     .then(() => console.log('MongoDB connected'))
@@ -301,7 +302,18 @@ io.on('connection', (socket) => {
         }).catch(e => {
             console.log('some error exists');
         })
-    })
+    });
+
+    socket.on('submitReports' , data => {
+        console.log('------------- reports ------------\n',data);
+        db.submitReport(data).then(res => {
+            if(res){
+                console.log(res);
+            }
+        }).catch(e => {
+            console.log(e);
+        })
+    });
 
     socket.on('disconnect', () => {
         console.log('user disconnect');

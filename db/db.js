@@ -4,6 +4,7 @@ const user = require('../model/user')
 const device = require('../model/device');
 const category = require('../model/category');
 const logins = require('../model/login');
+const report = require('../model/report');
 
 const loginValidate = (data) => {
     return new Promise((resolve, reject) => {
@@ -437,7 +438,7 @@ const configuration = (data) => {
                     $set: { "devices.$.configuration": true }
                 }
             ).then(doc => {
-                if(doc){
+                if (doc) {
                     console.log('configure sucessfully');
                 }
             }).catch(e => {
@@ -446,6 +447,34 @@ const configuration = (data) => {
 
         }, 0);
     })
+}
+
+const submitReport = (data) => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            const userId = data['projectId'],
+                deviceId = data['deviceId'],
+                subject = data['subject'],
+                description = data['description'],
+                deviceName = data['deviceName'],
+                email = data['email'];
+
+            report.create({
+                userId,
+                email,
+                deviceId,
+                deviceName,
+                subject,
+                description
+            }).then(doc => {
+                if (doc) {
+                    resolve("saved");
+                }
+            }).catch(e => {
+                reject("notSaved", e);
+            })
+        }, 0);
+    });
 }
 
 module.exports = {
@@ -460,5 +489,6 @@ module.exports = {
     resetDevice,
     confirmationEmail,
     changeLocation,
-    configuration
+    configuration,
+    submitReport
 };

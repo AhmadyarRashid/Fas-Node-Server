@@ -2,12 +2,20 @@ var mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 var report = new Schema({
-    _id :{
-      type:'String',
-      required: true
+    userId:{
+        type: 'String',
+        required:true
+    },
+    email:{
+        type:'String',
+        required:true
     },
     deviceId: {
         type: 'String',
+        required: true
+    },
+    deviceName: {
+        type:'String',
         required: true
     },
     subject: {
@@ -17,6 +25,14 @@ var report = new Schema({
     description:{
         type: 'String',
         required: true
+    },
+    status:{
+        type:'Number',
+        default:0
+    },
+    approve:{
+        type:'Boolean',
+        default:false
     }
 });
 
