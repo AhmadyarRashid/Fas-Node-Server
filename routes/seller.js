@@ -250,19 +250,19 @@ seller.post('/changePass', (req, res) => {
         { email: req.body.email, password: req.body.oldPass },
         { password: req.body.newPass }
     ).then(doc => {
-        if(doc){
+        if (doc) {
             console.log('doc found', doc)
-            if(doc.nModified > 0){
+            if (doc.nModified > 0) {
                 res.send({
                     acp: 'OK'
-                })  
-            }else{
+                })
+            } else {
                 res.send({
                     acp: 'OldPassWrong'
                 })
             }
-            
-        }else{
+
+        } else {
             console.log('no doc found')
             res.send({
                 acp: 'OldPassWrong'
@@ -270,23 +270,67 @@ seller.post('/changePass', (req, res) => {
         }
     }).catch(e => {
         res.send({
-            acp : 'SNP'
+            acp: 'SNP'
         })
     })
 });
 
-seller.post('/getReports' , (req, res) => {
+seller.post('/getReports', (req, res) => {
     console.log(req.body);
     report.find({}).then(doc => {
-        if(doc){
-            res.send({gr: 'OK' , doc: doc});
-        }else{
-            res.send({gr: 'noData'});
+        if (doc) {
+            res.send({ gr: 'OK', doc: doc });
+        } else {
+            res.send({ gr: 'noData' });
         }
     }).catch(e => {
         console.log(e);
-        res.send({gr: 'failed'});
+        res.send({ gr: 'failed' });
     })
+})
+
+seller.post('/sendReportUpdate', (req, res) => {
+    console.log(req.body);
+    report.updateOne(
+        { _id: req.body.reportId },
+        { status: req.body.status })
+        .then(doc => {
+            if (doc.nModified > 0) {
+                try {
+                    const email = req.body.email,
+                        description = req.body.description;
+                    var transporter = nodemailer.createTransport({
+                        service: 'gmail',
+                        host: 'smtp.gmail.com',
+                        port: 465,
+                        secure: true,
+                        auth: {
+                            user: 'ahmedyar61@gmail.com',
+                            pass: 'Maaz786786786'
+                        }
+                    });
+
+                    var mailOptions = {
+                        from: 'ahmedyar61@gmail.com',
+                        to: email,
+                        subject: 'Smart Fire Alarm System',
+                        text: `Dear User \n ${description}`
+                    };
+
+                    transporter.sendMail(mailOptions, function (error, info) {
+                        if (error) {
+                            console.log(error);
+                        } else {
+                            console.log('Email sent: ' + info.response);
+                        }
+                    });
+                } catch (e) {
+                    console.log(e);
+                } finally {
+                    res.send({ sru: 'OK' });
+                }
+            }
+        })
 })
 
 
