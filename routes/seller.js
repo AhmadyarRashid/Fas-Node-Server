@@ -205,7 +205,7 @@ seller.post('/sendReply', (req, res) => {
         secure: true,
         auth: {
             user: 'ahmedyar61@gmail.com',
-            pass: 'Maaz786786786'
+            pass: 'meo3400119339'
         }
     });
 
@@ -291,6 +291,7 @@ seller.post('/getReports', (req, res) => {
 
 seller.post('/sendReportUpdate', (req, res) => {
     console.log(req.body);
+    console.log(req.body.reportId);
     report.updateOne(
         { _id: req.body.reportId },
         { status: req.body.status })
@@ -306,7 +307,7 @@ seller.post('/sendReportUpdate', (req, res) => {
                         secure: true,
                         auth: {
                             user: 'ahmedyar61@gmail.com',
-                            pass: 'Maaz786786786'
+                            pass: 'meo3400119339'
                         }
                     });
 

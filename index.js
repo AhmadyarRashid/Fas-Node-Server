@@ -7,8 +7,11 @@ const express = require('express'),
     io = require('socket.io').listen(server);
 const db = require('./db/db');
 const mongoose = require('mongoose');
+const stripe = require("stripe")("sk_test_ywGSmVRTxvcRc61SCNEpkqJ1007yKWAI6u");
+
 
 app.use(bodyParser.json())
+app.use(require("body-parser").text());
 app.use(cors())
 app.use(
     bodyParser.urlencoded({
@@ -29,6 +32,22 @@ mongoose
 
 app.use('/users', Users)
 app.use('/seller', Seller)
+
+app.post("/charge", async (req, res) => {
+    console.log('recevie data', req);
+    try {
+      let { status } = await stripe.charges.create({
+        amount: 2000,
+        currency: "usd",
+        description: "An example charge",
+        source: req.body
+      });
+  
+      res.json({ status });
+    } catch (err) {
+      res.status(500).end();
+    }
+  });
 
 
 app.get('/', (req, res) => {
@@ -323,5 +342,5 @@ io.on('connection', (socket) => {
 });
 
 server.listen(3000, () => {
-    console.log('Node app server is running on 3000');
+    console.log('server is running on port 3000');
 });

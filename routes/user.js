@@ -9,6 +9,7 @@ const device = require('../model/device');
 const sales = require('../model/sale');
 const category = require('../model/category');
 const nodemailer = require('nodemailer');
+const stripe = require("stripe")("sk_test_ywGSmVRTxvcRc61SCNEpkqJ1007yKWAI6u");
 
 users.use(cors())
 
@@ -180,14 +181,15 @@ users.post('/getQty', (req, res) => {
                 count: { $sum: 1 }
             }
         }
-    ])
-        .then(doc => {
-            if (doc) {
-                res.send({ gq: 'OK', doc: doc })
-            } else {
-                res.send({ gq: 'NO Items Found' });
-            }
-        })
+    ]).then(doc => {
+        if (doc) {
+            res.send({ gq: 'OK', doc: doc })
+        } else {
+            res.send({ gq: 'NO Items Found' });
+        }
+    }).catch(e => {
+        res.send({gq: 'error' , err: e});
+    })
 });
 
 users.post('/contact', (req, res) => {
@@ -212,7 +214,7 @@ users.post('/contact', (req, res) => {
                 secure: true,
                 auth: {
                     user: 'ahmedyar61@gmail.com',
-                    pass: 'Maaz786786786'
+                    pass: 'meo3400119339'
                 }
             });
 
@@ -278,7 +280,7 @@ users.post('/buyProduct', (req, res) => {
                                 secure: true,
                                 auth: {
                                     user: 'ahmedyar61@gmail.com',
-                                    pass: 'Maaz786786786'
+                                    pass: 'meo3400119339'
                                 }
                             });
 
@@ -511,5 +513,22 @@ users.post('/orderFeedBack', (req, res) => {
             console.log(e);
         })
 })
+
+users.post("/charge",  async (req, res) => {
+    console.log('recevie data', req.body);
+    try {
+        let { status } = await stripe.charges.create({
+          amount: 2000,
+          currency: "usd",
+          description: "An example charge",
+          source: req.body
+        });
+    
+        res.json({ status });
+      } catch (err) {
+        res.status(500).end();
+      }
+    
+  });
 
 module.exports = users
