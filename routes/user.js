@@ -188,7 +188,7 @@ users.post('/getQty', (req, res) => {
             res.send({ gq: 'NO Items Found' });
         }
     }).catch(e => {
-        res.send({gq: 'error' , err: e});
+        res.send({ gq: 'error', err: e });
     })
 });
 
@@ -328,109 +328,113 @@ users.post('/buyProduct', (req, res) => {
                     })
 
 
+                if (req.body.hub > 0) {
+                    products.find({ type: 'HUB', status: false })
+                        .limit(req.body.hub)
+                        .then(res => {
+                            console.log('===========NOT SALE HUB ============\n', res);
+                            if (res) {
+                                res.forEach(p => {
+                                    devId = p._id
 
-                products.find({ type: 'HUB', status: false })
-                    .limit(req.body.hub)
-                    .then(res => {
-                        console.log('===========NOT SALE HUB ============\n', res);
-                        if (res) {
-                            res.forEach(p => {
-                                devId = p._id
-
-                                var dev = {
-                                    _id: devId,
-                                    label: 'HUB',
-                                    deviceType: 'HUB'
-                                }
-
-
-                                device.updateOne(
-                                    { userId: userId },
-                                    { $addToSet: { devices: dev } }
-                                ).then(res => {
-                                    console.log(res);
-                                }).catch(e => {
-                                    res.send({ 'bp': 'Failed' });
-                                    console.log(e);
-                                })
-
-
-                                products.updateOne(
-                                    { _id: devId },
-                                    { $set: { status: true } }
-                                ).then(res => {
-                                    if (res) {
-                                        console.log(res);
+                                    var dev = {
+                                        _id: devId,
+                                        label: 'HUB',
+                                        deviceType: 'HUB'
                                     }
-                                }).catch(e => {
-                                    res.send({ 'bp': 'Failed' });
-                                    console.log(e);
-                                })
-
-                            })
-
-                        }
-
-                    })
-                    .catch(e => {
-                        res.send({ 'bp': 'Failed' });
-                        console.log(e);
-                    })
 
 
-                products.find({ type: 'SLAVE', status: false })
-                    .limit(req.body.slave)
-                    .then(res => {
-                        console.log('=========== NOT SALE SLAVE ============\n', res);
-
-                        if (res) {
-                            res.forEach(i => {
-                                devId = i._id
-
-                                var dev = {
-                                    _id: devId,
-                                    label: 'SLAVE',
-                                    deviceType: 'SLAVE'
-                                }
-
-
-                                device.updateOne(
-                                    { userId: userId },
-                                    { $addToSet: { devices: dev } }
-                                ).then(res => {
-                                    console.log(res);
-                                }).catch(e => {
-                                    res.send({ 'bp': 'Failed' });
-                                    console.log(e);
-                                })
-
-
-                                products.updateOne({
-                                    _id: devId
-                                }, {
-                                        $set: {
-                                            status: true
-                                        }
-                                    })
-                                    .then(res => {
-                                        if (res) {
-                                            console.log(res);
-                                        }
-                                    })
-                                    .catch(e => {
+                                    device.updateOne(
+                                        { userId: userId },
+                                        { $addToSet: { devices: dev } }
+                                    ).then(res => {
+                                        console.log(res);
+                                    }).catch(e => {
                                         res.send({ 'bp': 'Failed' });
                                         console.log(e);
                                     })
 
 
-                            })
+                                    products.updateOne(
+                                        { _id: devId },
+                                        { $set: { status: true } }
+                                    ).then(res => {
+                                        if (res) {
+                                            console.log(res);
+                                        }
+                                    }).catch(e => {
+                                        res.send({ 'bp': 'Failed' });
+                                        console.log(e);
+                                    })
+
+                                })
+
+                            }
+
+                        })
+                        .catch(e => {
+                            res.send({ 'bp': 'Failed' });
+                            console.log(e);
+                        })
+                }
 
 
-                        }
-                    }).catch(e => {
-                        res.send({ 'bp': 'Failed' });
-                        console.log(e);
-                    });
+                if (req.body.slave > 0) {
+                    products.find({ type: 'SLAVE', status: false })
+                        .limit(req.body.slave)
+                        .then(res => {
+                            console.log('=========== NOT SALE SLAVE ============\n', res);
+
+                            if (res) {
+                                res.forEach(i => {
+                                    devId = i._id
+
+                                    var dev = {
+                                        _id: devId,
+                                        label: 'SLAVE',
+                                        deviceType: 'SLAVE'
+                                    }
+
+
+                                    device.updateOne(
+                                        { userId: userId },
+                                        { $addToSet: { devices: dev } }
+                                    ).then(res => {
+                                        console.log(res);
+                                    }).catch(e => {
+                                        res.send({ 'bp': 'Failed' });
+                                        console.log(e);
+                                    })
+
+
+                                    products.updateOne({
+                                        _id: devId
+                                    }, {
+                                            $set: {
+                                                status: true
+                                            }
+                                        })
+                                        .then(res => {
+                                            if (res) {
+                                                console.log(res);
+                                            }
+                                        })
+                                        .catch(e => {
+                                            res.send({ 'bp': 'Failed' });
+                                            console.log(e);
+                                        })
+
+
+                                })
+
+
+                            }
+                        }).catch(e => {
+                            res.send({ 'bp': 'Failed' });
+                            console.log(e);
+                        });
+                }
+
 
 
 
@@ -514,21 +518,106 @@ users.post('/orderFeedBack', (req, res) => {
         })
 })
 
-users.post("/charge",  async (req, res) => {
-    console.log('recevie data', req.body);
+users.post("/charge", async (req, res) => {
+    console.log('recevie data', req);
     try {
         let { status } = await stripe.charges.create({
-          amount: 2000,
-          currency: "usd",
-          description: "An example charge",
-          source: req.body
+            amount: 2000,
+            currency: "usd",
+            description: "An example charge",
+            source: req.body
         });
-    
+
         res.json({ status });
-      } catch (err) {
+    } catch (err) {
         res.status(500).end();
-      }
-    
-  });
+    }
+});
+
+users.post('/forgetPassword', (req, res) => {
+    console.log(req.body);
+    logins.findOne({ email: req.body.email })
+        .then(doc => {
+            if (doc) {
+                console.log(doc)
+                res.send({
+                    error: 'User Exists.'
+                })
+
+                userEmail = req.body.email
+
+
+                var transporter = nodemailer.createTransport({
+                    service: 'gmail',
+                    host: 'smtp.gmail.com',
+                    port: 465,
+                    secure: true,
+                    auth: {
+                        user: 'ahmedyar61@gmail.com',
+                        pass: 'meo3400119339'
+                    }
+                });
+
+                var mailOptions = {
+                    from: 'ahmedyar61@gmail.com',
+                    to: userEmail,
+                    subject: 'Smart Fire Alarm System : Forget Password',
+                    text: `Click on the link to Reset your password \n http://localhost:8080/resetPassword/${doc._id}`
+                };
+
+                transporter.sendMail(mailOptions, function (error, info) {
+                    if (error) {
+                        console.log(error);
+                    } else {
+                        console.log('Email sent: ' + info.response);
+                    }
+                });
+            }
+            else {
+                res.send({
+                    error: 'User not found.'
+                })
+            }
+        })
+        .catch(e => {
+            console.log(e)
+        })
+})
+
+users.post('/resetPassword', (req, res) => {
+    console.log(req.body);
+    logins.updateOne({ _id: req.body.id }, { password: req.body.password })
+        .then(doc => {
+            if (doc.nModified == 1) {
+                res.send({
+                    response: 'Password Change Sucessfully'
+                })
+            } else {
+                res.send({
+                    response: 'Password Not Update. Please Try After some time'
+                })
+            }
+        })
+        .catch(e => {
+            res.send({
+                response: 'No User Exists'
+            })
+        })
+});
+
+users.post('/confirmResetUser', (req, res) => {
+    console.log(req.body);
+    logins.findOne({ _id: req.body.id }).then(doc => {
+        if (doc) {
+            res.send({
+                response: 'user found'
+            })
+        }
+    }).catch(e => {
+        res.send({
+            response: 'error'
+        })
+    })
+});
 
 module.exports = users
