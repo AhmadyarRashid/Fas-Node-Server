@@ -9,6 +9,9 @@ const nodemailer = require('nodemailer');
 const adminLogin = require('../model/adminLogin');
 const report = require('../model/report');
 
+const gmailUserName = 'smartfirealarms@gmail.com';
+const gmailPass = 'Pakistan786@';
+
 seller.use(cors())
 
 process.env.SECRET_KEY = 'secret';
@@ -204,13 +207,13 @@ seller.post('/sendReply', (req, res) => {
         port: 465,
         secure: true,
         auth: {
-            user: 'ahmedyar61@gmail.com',
-            pass: 'meo3400119339'
+            user: gmailUserName,
+            pass: gmailPass
         }
     });
 
     var mailOptions = {
-        from: 'ahmedyar61@gmail.com',
+        from: gmailUserName,
         to: email,
         subject: 'Smart Fire Alarm System',
         text: `Dear ${name} \n Your Query : ${message} \n ${replySms}`
@@ -306,13 +309,13 @@ seller.post('/sendReportUpdate', (req, res) => {
                         port: 465,
                         secure: true,
                         auth: {
-                            user: 'ahmedyar61@gmail.com',
-                            pass: 'meo3400119339'
+                            user: gmailUserName,
+                            pass: gmailPass
                         }
                     });
 
                     var mailOptions = {
-                        from: 'ahmedyar61@gmail.com',
+                        from: gmailUserName,
                         to: email,
                         subject: 'Smart Fire Alarm System',
                         text: `Dear User \n ${description}`
@@ -333,6 +336,23 @@ seller.post('/sendReportUpdate', (req, res) => {
             }
         })
 })
+
+seller.post('/getSaleData', (req, res) => {
+    console.log('get sale data request comes on server ==========');
+    sales.aggregate([
+        {$group: {
+            _id: {$substr: ['$date', 4, 3]}, 
+            Orders: {$sum: 1}
+        }}
+    ]).then(doc => {
+        if(doc){
+            res.send({res:'ok' , data: doc});
+            console.log(doc);
+        }
+    }).catch(e => {
+        console.log('error occur in getSaleData');
+    })
+});
 
 
 module.exports = seller

@@ -34,20 +34,24 @@ app.use('/users', Users)
 app.use('/seller', Seller)
 
 app.post("/charge", async (req, res) => {
-    console.log('recevie data', req);
+    console.log('recevie data', req.body);
     try {
-      let { status } = await stripe.charges.create({
-        amount: 2000,
-        currency: "usd",
-        description: "An example charge",
-        source: req.body
-      });
-  
-      res.json({ status });
+        let { status } = await stripe.charges.create({
+            amount: req.body.bill,
+            currency: "usd",
+            description: "An example charge",
+            source: req.body.id
+        });
+
+        if (status) {
+            console.log('status is : ', status);
+            res.json({ status });
+        }
+
     } catch (err) {
-      res.status(500).end();
+        res.status(500).end();
     }
-  });
+});
 
 
 app.get('/', (req, res) => {
@@ -312,10 +316,10 @@ io.on('connection', (socket) => {
         })
     });
 
-    socket.on('configureDevice' , data => {
+    socket.on('configureDevice', data => {
         console.log('----------- configure device --------------', data);
         db.configuration(data).then(res => {
-            if(res){
+            if (res) {
                 console.log('configuration sucessfully');
             }
         }).catch(e => {
@@ -323,10 +327,10 @@ io.on('connection', (socket) => {
         })
     });
 
-    socket.on('submitReports' , data => {
-        console.log('------------- reports ------------\n',data);
+    socket.on('submitReports', data => {
+        console.log('------------- reports ------------\n', data);
         db.submitReport(data).then(res => {
-            if(res){
+            if (res) {
                 console.log(res);
             }
         }).catch(e => {

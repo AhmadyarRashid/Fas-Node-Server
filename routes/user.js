@@ -11,6 +11,9 @@ const category = require('../model/category');
 const nodemailer = require('nodemailer');
 const stripe = require("stripe")("sk_test_ywGSmVRTxvcRc61SCNEpkqJ1007yKWAI6u");
 
+const gmailUserName = 'smartfirealarms@gmail.com';
+const gmailPass = 'Pakistan786@';
+
 users.use(cors())
 
 process.env.SECRET_KEY = 'secret';
@@ -213,13 +216,13 @@ users.post('/contact', (req, res) => {
                 port: 465,
                 secure: true,
                 auth: {
-                    user: 'ahmedyar61@gmail.com',
-                    pass: 'meo3400119339'
+                    user: gmailUserName,
+                    pass: gmailPass
                 }
             });
 
             var mailOptions = {
-                from: 'ahmedyar61@gmail.com',
+                from: gmailUserName,
                 to: senderEmail,
                 subject: 'Smart Fire Alarm System',
                 text: 'Your message have been recieved. we will contact you as soon as possible'
@@ -279,13 +282,13 @@ users.post('/buyProduct', (req, res) => {
                                 port: 465,
                                 secure: true,
                                 auth: {
-                                    user: 'ahmedyar61@gmail.com',
-                                    pass: 'meo3400119339'
+                                    user: gmailUserName,
+                                    pass: gmailPass
                                 }
                             });
 
                             var mailOptions = {
-                                from: 'ahmedyar61@gmail.com',
+                                from: gmailUserName,
                                 to: senderEmail,
                                 subject: 'Smart Fire Alarm System',
                                 text: `Your order number # ${res._id} has been placed ${date} via Cash on Delivery. You will be updated with another email after your items have been shipped`
@@ -553,13 +556,13 @@ users.post('/forgetPassword', (req, res) => {
                     port: 465,
                     secure: true,
                     auth: {
-                        user: 'ahmedyar61@gmail.com',
-                        pass: 'meo3400119339'
+                        user: gmailUserName,
+                        pass: gmailPass
                     }
                 });
 
                 var mailOptions = {
-                    from: 'ahmedyar61@gmail.com',
+                    from: gmailUserName,
                     to: userEmail,
                     subject: 'Smart Fire Alarm System : Forget Password',
                     text: `Click on the link to Reset your password \n http://localhost:8080/resetPassword/${doc._id}`
