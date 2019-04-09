@@ -6,7 +6,7 @@ const users = require('../model/user');
 const query = require('../model/userQuery');
 const sales = require('../model/sale');
 const nodemailer = require('nodemailer');
-const adminLogin = require('../model/adminLogin');
+const adminLogin = require('../model/login');
 const report = require('../model/report');
 
 const gmailUserName = 'smartfirealarms@gmail.com';
@@ -235,7 +235,8 @@ seller.post('/login', (req, res) => {
     console.log(req.body);
     adminLogin.findOne({
         email: req.body.email,
-        password: req.body.password
+        password: req.body.password,
+        role: 'admin'
     }).then(doc => {
         if (doc) {
             res.send({ al: 'OK' });

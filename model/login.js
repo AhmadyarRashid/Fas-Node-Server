@@ -9,7 +9,11 @@ var login = new Schema({
     password: {
         type: 'String',
         required: true
+    },
+    role: {
+        type: 'String',
+        default: 'customer'
     }
 });
 
-module.exports = logins = mongoose.model('logins' , login);
+module.exports = logins = mongoose.model('logins', login);
