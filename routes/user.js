@@ -8,6 +8,8 @@ const userQuries = require('../model/userQuery');
 const device = require('../model/device');
 const sales = require('../model/sale');
 const category = require('../model/category');
+const report = require('../model/report');
+
 const nodemailer = require('nodemailer');
 const stripe = require("stripe")("sk_test_ywGSmVRTxvcRc61SCNEpkqJ1007yKWAI6u");
 
@@ -622,5 +624,55 @@ users.post('/confirmResetUser', (req, res) => {
         })
     })
 });
+
+// android app routes
+
+users.post('/getReportDetails', (req,res) => {
+    console.log('--------' , req.body);
+
+    report.find({
+        userId: req.body.userId
+    }).then(doc => {
+        if(doc){
+            res.send({'res': 'OK',doc});
+        }
+    }).catch(e => {
+        console.log(e);
+        res.send({'res': 'Some connection error'});
+    })
+});
+
+users.post('/updateReportStatus', (req,res) => {
+    console.log(req.body);
+
+    if(req.body.reportStatus == "approve"){
+        report.findOneAndUpdate({_id: req.body.id},
+            {'approve': true}
+        ).then(doc => {
+            if(doc){
+                console.log(doc);
+                res.send({'res' : 'OK'});
+            }
+        }).catch(e => {
+            console.log(e);
+            res.send({'res' : 'Failed'});
+        })
+    }
+    if(req.body.reportStatus == "reset"){
+        report.findOneAndUpdate({_id: req.body.id},
+            {'status': 1}
+        ).then(doc => {
+            if(doc){
+                console.log(doc);
+                res.send({'res' : 'OK'});
+            }
+        }).catch(e => {
+            console.log(e);
+            res.send({'res' : 'Failed'});
+        })
+    }
+
+   
+})
 
 module.exports = users

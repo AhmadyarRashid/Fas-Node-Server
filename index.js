@@ -53,6 +53,11 @@ app.post("/charge", async (req, res) => {
     }
 });
 
+app.post('/test' , (req,res) => {
+    console.log('------ this is testing', req.body);
+    res.send('Ok');
+})
+
 
 app.get('/', (req, res) => {
     console.log('web user connected');
