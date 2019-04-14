@@ -14,6 +14,10 @@ var userSchema = new Schema({
     phoneNo: {
         type: String
     },
+    city:{
+        type:String,
+        required:[true, 'city is required']
+    },
     address: {
         type: String
     },

@@ -477,6 +477,29 @@ const submitReport = (data) => {
     });
 }
 
+const sendHealth = data => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            const projId = data['projectId'],
+                deviceId = data['deviceId'],
+                health = data['health'];
+
+            device.updateOne(
+                { "userId": projId, "devices._id": deviceId },
+                {
+                    $set: { "devices.$.health": health }
+                }
+            ).then(doc => {
+                console.log('-------------- doc -----------',doc);
+                resolve(data);
+            }).catch(e => {
+                console.log(e);
+                reject('error');
+            });
+        }, 0);
+    });
+}
+
 module.exports = {
     loginValidate,
     loginConfirm,
@@ -490,5 +513,6 @@ module.exports = {
     confirmationEmail,
     changeLocation,
     configuration,
-    submitReport
+    submitReport,
+    sendHealth
 };

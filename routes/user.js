@@ -34,6 +34,8 @@ users.post('/register', (req, res) => {
             }).then(logindoc => {
                 console.log('========== doc ========\n', logindoc);
 
+
+
                 const dev = {
                     userId: logindoc._id
                 }
@@ -75,6 +77,7 @@ users.post('/register', (req, res) => {
                     name: req.body.name,
                     phoneNo: req.body.phoneNo,
                     email: req.body.email,
+                    city: req.body.city,
                     address: req.body.address,
                     password: req.body.password
                 }
@@ -88,6 +91,32 @@ users.post('/register', (req, res) => {
                 }).catch(e => {
                     res.send({ req: 'Some Network Problem' });
                 })
+
+                var transporter = nodemailer.createTransport({
+                    service: 'gmail',
+                    host: 'smtp.gmail.com',
+                    port: 465,
+                    secure: true,
+                    auth: {
+                        user: gmailUserName,
+                        pass: gmailPass
+                    }
+                });
+    
+                var mailOptions = {
+                    from: gmailUserName,
+                    to: req.body.email,
+                    subject: 'Smart Fire Alarm System',
+                    text: `Click on the link to Verify your email \n http://localhost:8080/verify/${logindoc._id}`
+                };
+    
+                transporter.sendMail(mailOptions, function (error, info) {
+                    if (error) {
+                        console.log('======= Email error ============' , error);
+                    } else {
+                        console.log('Email sent: ' + info.response);
+                    }
+                });
 
 
             }).catch(err => {
@@ -670,9 +699,23 @@ users.post('/updateReportStatus', (req,res) => {
             console.log(e);
             res.send({'res' : 'Failed'});
         })
-    }
-
-   
+    } 
 })
+
+users.post('/verifyEmail', (req,res) => {
+    console.log(req.body);
+
+    logins.findByIdAndUpdate({
+        _id: req.body.id
+    },{
+        verify: true
+    }).then(res => {
+        if(res){
+            console.log(res);
+        }
+    }).catch(e => {
+        console.log(e);
+    })
+});
 
 module.exports = users

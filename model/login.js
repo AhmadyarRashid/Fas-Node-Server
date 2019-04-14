@@ -13,6 +13,10 @@ var login = new Schema({
     role: {
         type: 'String',
         default: 'customer'
+    },
+    verify:{
+        type: Boolean,
+        default:false
     }
 });
 

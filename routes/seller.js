@@ -1,10 +1,11 @@
 const express = require("express")
 const seller = express.Router()
 const cors = require("cors")
-const products = require('../model/product')
+const products = require('../model/product');
 const users = require('../model/user');
 const query = require('../model/userQuery');
 const sales = require('../model/sale');
+const devices = require('../model/device');
 const nodemailer = require('nodemailer');
 const adminLogin = require('../model/login');
 const report = require('../model/report');
@@ -355,5 +356,22 @@ seller.post('/getSaleData', (req, res) => {
     })
 });
 
+seller.post('/getAllDevices', (req,res)=>{
+    devices.find({}).then(doc => {
+        if(doc){
+            deviceData = [];
+            doc.forEach((object,index) => {
+                object.devices.forEach(dev => {
+                    deviceData.push(dev);
+                });
+                console.log('-------- index - : ' , index , ' | object length = ' , doc.length);
+                if(index+1 == doc.length){
+                    res.send({gad:'OK' , doc:deviceData});
+                }
+            })
+        }
+    })
+})
 
-module.exports = seller
+
+module.exports = seller;

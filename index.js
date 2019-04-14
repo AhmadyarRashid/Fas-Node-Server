@@ -53,7 +53,7 @@ app.post("/charge", async (req, res) => {
     }
 });
 
-app.post('/test' , (req,res) => {
+app.post('/test', (req, res) => {
     console.log('------ this is testing', req.body);
     res.send('Ok');
 })
@@ -341,6 +341,17 @@ io.on('connection', (socket) => {
         }).catch(e => {
             console.log(e);
         })
+    });
+
+    socket.on('sendHealth', data => {
+        console.log('--------',data);
+        db.sendHealth(data).then((doc) => {
+            io.emit('informHealth' + data['projectId'], data);
+            console.log(doc);
+        }).catch((err) => {
+            io.emit('informHealth' + data['projectId'], data);
+            console.log(err);
+        });
     });
 
     socket.on('disconnect', () => {
