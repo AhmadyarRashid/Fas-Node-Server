@@ -718,4 +718,20 @@ users.post('/verifyEmail', (req,res) => {
     })
 });
 
+users.post('/emailVerifyOrNot', (req,res) => {
+    console.log(req.body);
+
+    logins.findOne({
+        _id: req.body.id
+    }).then(doc => {
+        if(doc){
+            res.send({evon: 'OK' , doc});
+        }else{
+            res.send({evon: 'error'});
+        }
+    }).catch(e => {
+        res.send({evon: 'error'});
+    })
+});
+
 module.exports = users
