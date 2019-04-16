@@ -9,6 +9,7 @@ const device = require('../model/device');
 const sales = require('../model/sale');
 const category = require('../model/category');
 const report = require('../model/report');
+const serviceReport = require('../model/serviceReports');
 
 const nodemailer = require('nodemailer');
 const stripe = require("stripe")("sk_test_ywGSmVRTxvcRc61SCNEpkqJ1007yKWAI6u");
@@ -102,17 +103,17 @@ users.post('/register', (req, res) => {
                         pass: gmailPass
                     }
                 });
-    
+
                 var mailOptions = {
                     from: gmailUserName,
                     to: req.body.email,
                     subject: 'Smart Fire Alarm System',
                     text: `Click on the link to Verify your email \n http://localhost:8080/verify/${logindoc._id}`
                 };
-    
+
                 transporter.sendMail(mailOptions, function (error, info) {
                     if (error) {
-                        console.log('======= Email error ============' , error);
+                        console.log('======= Email error ============', error);
                     } else {
                         console.log('Email sent: ' + info.response);
                     }
@@ -656,82 +657,107 @@ users.post('/confirmResetUser', (req, res) => {
 
 // android app routes
 
-users.post('/getReportDetails', (req,res) => {
-    console.log('--------' , req.body);
+users.post('/getReportDetails', (req, res) => {
+    console.log('--------', req.body);
 
     report.find({
         userId: req.body.userId
     }).then(doc => {
-        if(doc){
-            res.send({'res': 'OK',doc});
+        if (doc) {
+            res.send({ 'res': 'OK', doc });
         }
     }).catch(e => {
         console.log(e);
-        res.send({'res': 'Some connection error'});
+        res.send({ 'res': 'Some connection error' });
     })
 });
 
-users.post('/updateReportStatus', (req,res) => {
+users.post('/updateReportStatus', (req, res) => {
     console.log(req.body);
 
-    if(req.body.reportStatus == "approve"){
-        report.findOneAndUpdate({_id: req.body.id},
-            {'approve': true}
+    if (req.body.reportStatus == "approve") {
+        report.findOneAndUpdate({ _id: req.body.id },
+            { 'approve': true }
         ).then(doc => {
-            if(doc){
+            if (doc) {
                 console.log(doc);
-                res.send({'res' : 'OK'});
+                res.send({ 'res': 'OK' });
             }
         }).catch(e => {
             console.log(e);
-            res.send({'res' : 'Failed'});
+            res.send({ 'res': 'Failed' });
         })
     }
-    if(req.body.reportStatus == "reset"){
-        report.findOneAndUpdate({_id: req.body.id},
-            {'status': 1}
+    if (req.body.reportStatus == "reset") {
+        report.findOneAndUpdate({ _id: req.body.id },
+            { 'status': 1 }
         ).then(doc => {
-            if(doc){
+            if (doc) {
                 console.log(doc);
-                res.send({'res' : 'OK'});
+                res.send({ 'res': 'OK' });
             }
         }).catch(e => {
             console.log(e);
-            res.send({'res' : 'Failed'});
+            res.send({ 'res': 'Failed' });
         })
-    } 
+    }
 })
 
-users.post('/verifyEmail', (req,res) => {
+users.post('/verifyEmail', (req, res) => {
     console.log(req.body);
 
     logins.findByIdAndUpdate({
         _id: req.body.id
-    },{
-        verify: true
-    }).then(res => {
-        if(res){
-            console.log(res);
-        }
-    }).catch(e => {
-        console.log(e);
-    })
+    }, {
+            verify: true
+        }).then(res => {
+            if (res) {
+                console.log(res);
+            }
+        }).catch(e => {
+            console.log(e);
+        })
 });
 
-users.post('/emailVerifyOrNot', (req,res) => {
+users.post('/emailVerifyOrNot', (req, res) => {
     console.log(req.body);
 
     logins.findOne({
         _id: req.body.id
     }).then(doc => {
-        if(doc){
-            res.send({evon: 'OK' , doc});
-        }else{
-            res.send({evon: 'error'});
+        if (doc) {
+            res.send({ evon: 'OK', doc });
+        } else {
+            res.send({ evon: 'error' });
         }
     }).catch(e => {
-        res.send({evon: 'error'});
+        res.send({ evon: 'error' });
     })
 });
+
+users.post('/submitServiceReport', (req, res) => {
+    console.log(req.body);
+    serviceReport.create(req.body)
+        .then(doc => {
+            if (doc) {
+                res.send({ ssr: 'OK', doc });
+            }
+        }).catch(e => {
+            res.send({ ssr: 'error' });
+        })
+});
+
+users.post('/getAllServiceReport', (req, res) => {
+    console.log(req.body);
+    serviceReport.find({
+        userId: req.body.userId
+    }).then(doc => {
+        if (doc) {
+            res.send({ gasr: 'OK', doc });
+        }
+    }).catch(e => {
+        res.send({ gasr: 'error' });
+    })
+})
 
 module.exports = users

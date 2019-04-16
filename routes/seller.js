@@ -9,6 +9,7 @@ const devices = require('../model/device');
 const nodemailer = require('nodemailer');
 const adminLogin = require('../model/login');
 const report = require('../model/report');
+const serviceReport = require('../model/serviceReports');
 
 const gmailUserName = 'smartfirealarms@gmail.com';
 const gmailPass = 'Pakistan786@';
@@ -371,7 +372,34 @@ seller.post('/getAllDevices', (req,res)=>{
             })
         }
     })
-})
+});
 
+seller.post('/getAllServiceReport', (req,res) => {
+    console.log(req.body);
+
+    serviceReport.find({status: false})
+    .then(doc => {
+        if(doc){
+            res.send({gasr: 'OK' , doc});
+        }
+    }).catch(e => {
+        res.send({gasr: 'error'});
+        console.log(e);
+    })
+});
+
+
+seller.post('/sendReplyToServiceReport', (req,res) => {
+    console.log(req.body);
+
+    serviceReport.findByIdAndUpdate({_id: req.body.id},
+        {response: req.body.response}).then(doc => {
+            if(doc){
+                res.send({srtsr: 'OK', doc});
+            }
+        }).catch(e => {
+            res.send({srtsr: 'error'});
+        })
+})
 
 module.exports = seller;
