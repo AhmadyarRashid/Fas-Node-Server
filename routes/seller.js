@@ -393,9 +393,35 @@ seller.post('/sendReplyToServiceReport', (req,res) => {
     console.log(req.body);
 
     serviceReport.findByIdAndUpdate({_id: req.body.id},
-        {response: req.body.response}).then(doc => {
+        {response: req.body.response, status:true}).then(doc => {
             if(doc){
                 res.send({srtsr: 'OK', doc});
+
+                var transporter = nodemailer.createTransport({
+                    service: 'gmail',
+                    host: 'smtp.gmail.com',
+                    port: 465,
+                    secure: true,
+                    auth: {
+                        user: gmailUserName,
+                        pass: gmailPass
+                    }
+                });
+
+                var mailOptions = {
+                    from: gmailUserName,
+                    to: req.body.email,
+                    subject: 'Smart Fire Alarm System',
+                    text: `Dear User  \nYour Query:  ${req.body.description} \nResponse:  ${req.body.response}`
+                };
+
+                transporter.sendMail(mailOptions, function (error, info) {
+                    if (error) {
+                        console.log(error);
+                    } else {
+                        console.log('Email sent: ' + info.response);
+                    }
+                });
             }
         }).catch(e => {
             res.send({srtsr: 'error'});

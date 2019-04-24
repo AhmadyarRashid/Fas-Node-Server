@@ -490,10 +490,10 @@ const sendHealth = data => {
                     $set: { "devices.$.health": health }
                 }
             ).then(doc => {
-                console.log('-------------- doc -----------',doc);
+              //  console.log('-------------- doc -----------',doc);
                 resolve(data);
             }).catch(e => {
-                console.log(e);
+               // console.log(e);
                 reject('error');
             });
         }, 0);

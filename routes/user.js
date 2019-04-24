@@ -130,6 +130,8 @@ users.post('/register', (req, res) => {
     })
 })
 
+
+// 192.168.1.8:3000/users/login
 users.post('/login', (req, res) => {
     console.log(req.body);
     logins.findOne({
@@ -661,7 +663,8 @@ users.post('/getReportDetails', (req, res) => {
     console.log('--------', req.body);
 
     report.find({
-        userId: req.body.userId
+        userId: req.body.userId,
+        approve: false
     }).then(doc => {
         if (doc) {
             res.send({ 'res': 'OK', doc });
@@ -690,7 +693,7 @@ users.post('/updateReportStatus', (req, res) => {
     }
     if (req.body.reportStatus == "reset") {
         report.findOneAndUpdate({ _id: req.body.id },
-            { 'status': 1 }
+            { 'status': 1 , 'approve': false}
         ).then(doc => {
             if (doc) {
                 console.log(doc);

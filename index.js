@@ -8,11 +8,15 @@ const express = require('express'),
 const db = require('./db/db');
 const mongoose = require('mongoose');
 const stripe = require("stripe")("sk_test_ywGSmVRTxvcRc61SCNEpkqJ1007yKWAI6u");
+const FCM = require('fcm-node');
+
+var serverKey = 'AIzaSyDuidqbHbrqmrjw7iJ-W6KI2_A04TqhSVE';
+var fcm = new FCM(serverKey);
 
 
-app.use(bodyParser.json())
+app.use(bodyParser.json());
 app.use(require("body-parser").text());
-app.use(cors())
+app.use(cors());
 app.use(
     bodyParser.urlencoded({
         extended: false
@@ -56,8 +60,7 @@ app.post("/charge", async (req, res) => {
 app.post('/test', (req, res) => {
     console.log('------ this is testing', req.body);
     res.send('Ok');
-})
-
+});
 
 app.get('/', (req, res) => {
     console.log('web user connected');
@@ -210,6 +213,7 @@ io.on('connection', (socket) => {
         });
     });
 
+
     socket.on('changeLabel', (data) => {
         console.log('---change label----', data);
 
@@ -293,8 +297,9 @@ io.on('connection', (socket) => {
     });
 
     socket.on('AlertFire', (data) => {
-        console.log(data);
-        io.emit('InfoAlert' + data['projectId'], data);
+        console.log('==========Alert=============',data);
+        sendPushNotification(data);
+       // io.emit('InfoAlert' + data['projectId'], data);
         console.log('---------------------');
     });
 
@@ -344,14 +349,26 @@ io.on('connection', (socket) => {
     });
 
     socket.on('sendHealth', data => {
-        console.log('--------',data);
+     //   console.log('--------',data);
         db.sendHealth(data).then((doc) => {
             io.emit('informHealth' + data['projectId'], data);
-            console.log(doc);
+           // console.log(doc);
         }).catch((err) => {
             io.emit('informHealth' + data['projectId'], data);
-            console.log(err);
+          //  console.log(err);
         });
+    });
+
+    socket.on('slaveSendAlert' , data => {
+        console.log('Slave alert');
+
+        io.emit('informAlertToHub' + data['projectId'] , data);
+
+        sendPushNotification(data);
+        // setTimeout(() => {
+        //     io.emit('InfoAlert' + data['projectId'], data);
+        // } , 1000);
+       
     });
 
     socket.on('disconnect', () => {
@@ -360,6 +377,57 @@ io.on('connection', (socket) => {
 
 
 });
+
+const sendPushNotification = data => {
+
+    var message = { 
+        to: 'cCQ-9S_1eMU:APA91bHRJopgagjqvpDFiaylMZinUmgdS1mTcCq_dHLwGO4iKcUsLRMx8GkurNc7g8LlX-3WDAeAQb36IZIPl_7rBOokR32vpodhCkwGsChKVxgGPK3m6PfZdie8_uH09wKhfg8KAjYM',
+        collapse_key: 'type_a',
+    
+        notification: {
+            title: 'Fire Alert',
+            body: `Device Name is ${data.label} \nLocation is ${data.location}`
+        },
+    
+        data: {  
+            my_key: 'my value',
+            my_another_key: 'my another value'
+        }
+    };
+    
+    fcm.send(message, function (err, response) {
+        if (err) {
+            console.log("Something has gone wrong!");
+        } else {
+            console.log("Successfully sent with response: ", response);
+        }
+    });
+
+    //esto8hMECFE:APA91bH89HeA33vKaH7lghlI1q8E4WU3rV_LcGVP0oeCSeFXje0Rnu7ZWgHtJ1V7JsKk8esE0enZItkH8jSMPRw_3WrPixF1LechnO2onFiCQ9jC2CDTYQVxG8oSqOZXRVCufk9rBUYE
+
+    var message = { 
+        to: 'esto8hMECFE:APA91bH89HeA33vKaH7lghlI1q8E4WU3rV_LcGVP0oeCSeFXje0Rnu7ZWgHtJ1V7JsKk8esE0enZItkH8jSMPRw_3WrPixF1LechnO2onFiCQ9jC2CDTYQVxG8oSqOZXRVCufk9rBUYE',
+        collapse_key: 'type_a',
+    
+        notification: {
+            title: 'Fire Alert',
+            body: `Device Name is ${data.label} \nLocation is ${data.location}`
+        },
+    
+        data: {  
+            my_key: 'my value',
+            my_another_key: 'my another value'
+        }
+    };
+    
+    fcm.send(message, function (err, response) {
+        if (err) {
+            console.log("Something has gone wrong!");
+        } else {
+            console.log("Successfully sent with response: ", response);
+        }
+    });
+}
 
 server.listen(3000, () => {
     console.log('server is running on port 3000');
