@@ -241,7 +241,7 @@ users.post('/contact', (req, res) => {
             console.log('your query submit sucessfully', doc);
             res.send({ 'con': 'OK' });
 
-            senderEmail = req.body.email
+            let senderEmail = req.body.email
 
 
             var transporter = nodemailer.createTransport({

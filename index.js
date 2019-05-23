@@ -23,7 +23,10 @@ app.use(
     })
 )
 
-const mongoURI = "mongodb://localhost:27017/FAS";
+
+
+
+const mongoURI = "mongodb+srv://smartfirealarms:Pakistan786@fas-y3tyy.mongodb.net/test?retryWrites=true";
 var Users = require('./routes/user')
 var Seller = require('./routes/seller')
 
@@ -349,7 +352,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('sendHealth', data => {
-     //   console.log('--------',data);
+       console.log('--------',data);
         db.sendHealth(data).then((doc) => {
             io.emit('informHealth' + data['projectId'], data);
            // console.log(doc);
@@ -381,7 +384,7 @@ io.on('connection', (socket) => {
 const sendPushNotification = data => {
 
     var message = { 
-        to: 'cCQ-9S_1eMU:APA91bHRJopgagjqvpDFiaylMZinUmgdS1mTcCq_dHLwGO4iKcUsLRMx8GkurNc7g8LlX-3WDAeAQb36IZIPl_7rBOokR32vpodhCkwGsChKVxgGPK3m6PfZdie8_uH09wKhfg8KAjYM',
+        to: 'esto8hMECFE:APA91bH89HeA33vKaH7lghlI1q8E4WU3rV_LcGVP0oeCSeFXje0Rnu7ZWgHtJ1V7JsKk8esE0enZItkH8jSMPRw_3WrPixF1LechnO2onFiCQ9jC2CDTYQVxG8oSqOZXRVCufk9rBUYE',
         collapse_key: 'type_a',
     
         notification: {
@@ -405,28 +408,28 @@ const sendPushNotification = data => {
 
     //esto8hMECFE:APA91bH89HeA33vKaH7lghlI1q8E4WU3rV_LcGVP0oeCSeFXje0Rnu7ZWgHtJ1V7JsKk8esE0enZItkH8jSMPRw_3WrPixF1LechnO2onFiCQ9jC2CDTYQVxG8oSqOZXRVCufk9rBUYE
 
-    var message = { 
-        to: 'esto8hMECFE:APA91bH89HeA33vKaH7lghlI1q8E4WU3rV_LcGVP0oeCSeFXje0Rnu7ZWgHtJ1V7JsKk8esE0enZItkH8jSMPRw_3WrPixF1LechnO2onFiCQ9jC2CDTYQVxG8oSqOZXRVCufk9rBUYE',
-        collapse_key: 'type_a',
+    // var message = { 
+    //     to: 'esto8hMECFE:APA91bH89HeA33vKaH7lghlI1q8E4WU3rV_LcGVP0oeCSeFXje0Rnu7ZWgHtJ1V7JsKk8esE0enZItkH8jSMPRw_3WrPixF1LechnO2onFiCQ9jC2CDTYQVxG8oSqOZXRVCufk9rBUYE',
+    //     collapse_key: 'type_a',
     
-        notification: {
-            title: 'Fire Alert',
-            body: `Device Name is ${data.label} \nLocation is ${data.location}`
-        },
+    //     notification: {
+    //         title: 'Fire Alert',
+    //         body: `Device Name is ${data.label} \nLocation is ${data.location}`
+    //     },
     
-        data: {  
-            my_key: 'my value',
-            my_another_key: 'my another value'
-        }
-    };
+    //     data: {  
+    //         my_key: 'my value',
+    //         my_another_key: 'my another value'
+    //     }
+    // };
     
-    fcm.send(message, function (err, response) {
-        if (err) {
-            console.log("Something has gone wrong!");
-        } else {
-            console.log("Successfully sent with response: ", response);
-        }
-    });
+    // fcm.send(message, function (err, response) {
+    //     if (err) {
+    //         console.log("Something has gone wrong!");
+    //     } else {
+    //         console.log("Successfully sent with response: ", response);
+    //     }
+    // });
 }
 
 server.listen(3000, () => {

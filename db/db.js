@@ -9,7 +9,7 @@ const report = require('../model/report');
 const loginValidate = (data) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            const client = new MongoClient('mongodb://localhost:27017', { useNewUrlParser: true });
+            const client = new MongoClient('mongodb+srv://smartfirealarms:Pakistan786@fas-y3tyy.mongodb.net/test?retryWrites=true', { useNewUrlParser: true });
             client.connect(function (err) {
                 if (err) {
                     console.log('>>>backend file connection error');
@@ -39,7 +39,7 @@ const loginConfirm = (data) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
             console.log('----------------login confirm data-------------');
-            const client = new MongoClient('mongodb://localhost:27017', { useNewUrlParser: true });
+            const client = new MongoClient('mongodb+srv://smartfirealarms:Pakistan786@fas-y3tyy.mongodb.net/test?retryWrites=true', { useNewUrlParser: true });
             client.connect(function (err) {
                 if (err) {
                     console.log('>>>backend file connection error');
@@ -161,7 +161,7 @@ const requestAllData = (data) => {
 const updateLabel = (data) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            const client = new MongoClient('mongodb://localhost:27017', { useNewUrlParser: true });
+            const client = new MongoClient('mongodb+srv://smartfirealarms:Pakistan786@fas-y3tyy.mongodb.net/test?retryWrites=true', { useNewUrlParser: true });
             client.connect(function (err) {
                 if (err) {
                     reject('db connection error');
@@ -190,7 +190,7 @@ const updateLabel = (data) => {
 const updateCategory = (data) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            const client = new MongoClient('mongodb://localhost:27017', { useNewUrlParser: true });
+            const client = new MongoClient('mongodb+srv://smartfirealarms:Pakistan786@fas-y3tyy.mongodb.net/test?retryWrites=true', { useNewUrlParser: true });
             client.connect(function (err) {
                 if (err) {
                     reject('db connection error');
@@ -220,7 +220,7 @@ const updateCategory = (data) => {
 const addNewCategory = (data) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            const client = new MongoClient('mongodb://localhost:27017', { useNewUrlParser: true });
+            const client = new MongoClient('mongodb+srv://smartfirealarms:Pakistan786@fas-y3tyy.mongodb.net/test?retryWrites=true', { useNewUrlParser: true });
             client.connect(function (err) {
                 if (err) {
                     reject('db connection error');
@@ -247,7 +247,7 @@ const addNewCategory = (data) => {
 const deleteCategory = (data) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            const client = new MongoClient('mongodb://localhost:27017', { useNewUrlParser: true });
+            const client = new MongoClient('mongodb+srv://smartfirealarms:Pakistan786@fas-y3tyy.mongodb.net/test?retryWrites=true', { useNewUrlParser: true });
             client.connect(function (err) {
                 if (err) {
                     reject('db connection error');
@@ -329,7 +329,7 @@ const changePassword = (data) => {
 const resetDevice = (data) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            const client = new MongoClient('mongodb://localhost:27017', { useNewUrlParser: true });
+            const client = new MongoClient('mongodb+srv://smartfirealarms:Pakistan786@fas-y3tyy.mongodb.net/test?retryWrites=true', { useNewUrlParser: true });
             client.connect(function (err) {
                 if (err) {
                     reject('db connection error');
@@ -359,7 +359,7 @@ const resetDevice = (data) => {
 const confirmationEmail = (data) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            const client = new MongoClient('mongodb://localhost:27017', { useNewUrlParser: true });
+            const client = new MongoClient('mongodb+srv://smartfirealarms:Pakistan786@fas-y3tyy.mongodb.net/test?retryWrites=true', { useNewUrlParser: true });
             client.connect(function (err) {
                 if (err) {
                     reject('db connection error');

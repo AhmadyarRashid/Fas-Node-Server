@@ -21,7 +21,7 @@ process.env.SECRET_KEY = 'secret';
 seller.post('/addDevice', (req, res) => {
     console.log(req.body);
 
-    devices = []
+    let devices = []
     for (var i = 0; i < Number(req.body.qty); i++) {
         devices.push({
             type: req.body.type,
@@ -145,7 +145,7 @@ seller.post('/getSales', (req, res) => {
         .then(doc => {
             if (doc) {
                 //console.log('======== joins ===== \n', JSON.stringify(doc, null, 2));
-                sendlist = []
+                let sendlist = []
                 doc.forEach((sale, index) => {
                     let s = {
                         _id: sale._id,
@@ -185,11 +185,11 @@ seller.post('/getSales', (req, res) => {
 seller.post('/sendReply', (req, res) => {
     console.log(req.body);
 
-    id = req.body.id;
-    name = req.body.name;
-    email = req.body.email;
-    message = req.body.message;
-    replySms = req.body.replySms;
+    let id = req.body.id;
+    let name = req.body.name;
+    let email = req.body.email;
+    let message = req.body.message;
+    let replySms = req.body.replySms;
 
 
     query.updateOne(
@@ -343,13 +343,15 @@ seller.post('/sendReportUpdate', (req, res) => {
 seller.post('/getSaleData', (req, res) => {
     console.log('get sale data request comes on server ==========');
     sales.aggregate([
-        {$group: {
-            _id: {$substr: ['$date', 4, 3]}, 
-            Orders: {$sum: 1}
-        }}
+        {
+            $group: {
+                _id: { $substr: ['$date', 4, 3] },
+                Orders: { $sum: 1 }
+            }
+        }
     ]).then(doc => {
-        if(doc){
-            res.send({res:'ok' , data: doc});
+        if (doc) {
+            res.send({ res: 'ok', data: doc });
             console.log(doc);
         }
     }).catch(e => {
@@ -357,45 +359,45 @@ seller.post('/getSaleData', (req, res) => {
     })
 });
 
-seller.post('/getAllDevices', (req,res)=>{
+seller.post('/getAllDevices', (req, res) => {
     devices.find({}).then(doc => {
-        if(doc){
-            deviceData = [];
-            doc.forEach((object,index) => {
+        if (doc) {
+            let deviceData = [];
+            doc.forEach((object, index) => {
                 object.devices.forEach(dev => {
                     deviceData.push(dev);
                 });
-                console.log('-------- index - : ' , index , ' | object length = ' , doc.length);
-                if(index+1 == doc.length){
-                    res.send({gad:'OK' , doc:deviceData});
+                console.log('-------- index - : ', index, ' | object length = ', doc.length);
+                if (index + 1 == doc.length) {
+                    res.send({ gad: 'OK', doc: deviceData });
                 }
             })
         }
     })
 });
 
-seller.post('/getAllServiceReport', (req,res) => {
+seller.post('/getAllServiceReport', (req, res) => {
     console.log(req.body);
 
-    serviceReport.find({status: false})
-    .then(doc => {
-        if(doc){
-            res.send({gasr: 'OK' , doc});
-        }
-    }).catch(e => {
-        res.send({gasr: 'error'});
-        console.log(e);
-    })
+    serviceReport.find({ status: false })
+        .then(doc => {
+            if (doc) {
+                res.send({ gasr: 'OK', doc });
+            }
+        }).catch(e => {
+            res.send({ gasr: 'error' });
+            console.log(e);
+        })
 });
 
 
-seller.post('/sendReplyToServiceReport', (req,res) => {
+seller.post('/sendReplyToServiceReport', (req, res) => {
     console.log(req.body);
 
-    serviceReport.findByIdAndUpdate({_id: req.body.id},
-        {response: req.body.response, status:true}).then(doc => {
-            if(doc){
-                res.send({srtsr: 'OK', doc});
+    serviceReport.findByIdAndUpdate({ _id: req.body.id },
+        { response: req.body.response, status: true }).then(doc => {
+            if (doc) {
+                res.send({ srtsr: 'OK', doc });
 
                 var transporter = nodemailer.createTransport({
                     service: 'gmail',
@@ -424,7 +426,7 @@ seller.post('/sendReplyToServiceReport', (req,res) => {
                 });
             }
         }).catch(e => {
-            res.send({srtsr: 'error'});
+            res.send({ srtsr: 'error' });
         })
 })
 
