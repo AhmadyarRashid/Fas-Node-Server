@@ -1,18 +1,14 @@
 const express = require('express'),
     http = require('http'),
     app = express(),
-    path = require('path'),
     cors = require("cors"),
     bodyParser = require("body-parser"),
-    server = require('http').Server(app),
-    io = require('socket.io')(server);
+    server = http.createServer(app),
+    io = require('socket.io').listen(server);
 const db = require('./db/db');
 const mongoose = require('mongoose');
 const stripe = require("stripe")("sk_test_ywGSmVRTxvcRc61SCNEpkqJ1007yKWAI6u");
 const FCM = require('fcm-node');
-
-app.set('view engine', 'ejs');
-const PORT = process.env.PORT || 3000;
 
 var serverKey = 'AIzaSyDuidqbHbrqmrjw7iJ-W6KI2_A04TqhSVE';
 var fcm = new FCM(serverKey);
@@ -43,10 +39,6 @@ mongoose
 
 app.use('/users', Users)
 app.use('/seller', Seller)
-
-app.get('*', (req, res) => {
-    res.send('Welcome to the future');
-});
 
 app.post("/charge", async (req, res) => {
     console.log('recevie data', req.body);
@@ -440,6 +432,6 @@ const sendPushNotification = data => {
     // });
 }
 
-server.listen(PORT, () => {
-    console.log('server is running on port ' , PORT);
+server.listen(process.env.PORT || 3000, () => {
+    console.log('server is running on port 3000');
 });
