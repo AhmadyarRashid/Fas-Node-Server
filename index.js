@@ -3,8 +3,8 @@ const express = require('express'),
     app = express(),
     cors = require("cors"),
     bodyParser = require("body-parser"),
-    server = http.createServer(app),
-    io = require('socket.io').listen(server);
+    server = require('http').Server(app),
+    io = require('socket.io')(server);
 const db = require('./db/db');
 const mongoose = require('mongoose');
 const stripe = require("stripe")("sk_test_ywGSmVRTxvcRc61SCNEpkqJ1007yKWAI6u");
@@ -42,6 +42,10 @@ mongoose
 
 app.use('/users', Users)
 app.use('/seller', Seller)
+
+app.get('*', (req, res) => {
+    res.send('Welcome to the future');
+});
 
 app.post("/charge", async (req, res) => {
     console.log('recevie data', req.body);
