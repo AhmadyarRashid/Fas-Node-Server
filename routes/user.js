@@ -1,6 +1,7 @@
 const express = require("express")
 const users = express.Router()
 const cors = require("cors")
+const bodyParser = require("body-parser")
 const User = require('../model/user')
 const logins = require('../model/login');
 const products = require('../model/product');
@@ -18,11 +19,13 @@ const gmailUserName = 'smartfirealarms@gmail.com';
 const gmailPass = 'Pakistan786@';
 
 users.use(cors())
+users.use(bodyParser.json());
+users.use(require("body-parser").text());
 
 process.env.SECRET_KEY = 'secret';
 
 users.post('/register', (req, res) => {
-    console.log(req.body);
+    
     logins.findOne({
         email: req.body.email
     }).then(doc => {
@@ -133,7 +136,7 @@ users.post('/register', (req, res) => {
 
 // 192.168.1.8:3000/users/login
 users.post('/login', (req, res) => {
-    console.log(req.body);
+
     logins.findOne({
         email: req.body.email,
         password: req.body.password
@@ -511,8 +514,6 @@ users.post('/myorders', (req, res) => {
 })
 
 users.post('/receivedOrder', (req, res) => {
-    console.log(req.body);
-
     sales.updateOne({
         _id: req.body.id
     }, {
@@ -534,7 +535,7 @@ users.post('/receivedOrder', (req, res) => {
 })
 
 users.post('/orderFeedBack', (req, res) => {
-    console.log(req.body);
+   
     sales.updateOne({
         _id: req.body.id
     }, {
@@ -556,7 +557,7 @@ users.post('/orderFeedBack', (req, res) => {
 })
 
 users.post("/charge", async (req, res) => {
-    console.log('recevie data', req);
+
     try {
         let { status } = await stripe.charges.create({
             amount: 2000,
@@ -572,7 +573,7 @@ users.post("/charge", async (req, res) => {
 });
 
 users.post('/forgetPassword', (req, res) => {
-    console.log(req.body);
+  
     logins.findOne({ email: req.body.email })
         .then(doc => {
             if (doc) {
@@ -622,7 +623,7 @@ users.post('/forgetPassword', (req, res) => {
 })
 
 users.post('/resetPassword', (req, res) => {
-    console.log(req.body);
+   
     logins.updateOne({ _id: req.body.id }, { password: req.body.password })
         .then(doc => {
             if (doc.nModified == 1) {
@@ -643,7 +644,7 @@ users.post('/resetPassword', (req, res) => {
 });
 
 users.post('/confirmResetUser', (req, res) => {
-    console.log(req.body);
+
     logins.findOne({ _id: req.body.id }).then(doc => {
         if (doc) {
             res.send({
@@ -660,7 +661,6 @@ users.post('/confirmResetUser', (req, res) => {
 // android app routes
 
 users.post('/getReportDetails', (req, res) => {
-    console.log('--------', req.body);
 
     report.find({
         userId: req.body.userId,
@@ -676,7 +676,7 @@ users.post('/getReportDetails', (req, res) => {
 });
 
 users.post('/updateReportStatus', (req, res) => {
-    console.log(req.body);
+
 
     if (req.body.reportStatus == "approve") {
         report.findOneAndUpdate({ _id: req.body.id },
@@ -707,8 +707,7 @@ users.post('/updateReportStatus', (req, res) => {
 })
 
 users.post('/verifyEmail', (req, res) => {
-    console.log(req.body);
-
+    
     logins.findByIdAndUpdate({
         _id: req.body.id
     }, {
@@ -723,7 +722,6 @@ users.post('/verifyEmail', (req, res) => {
 });
 
 users.post('/emailVerifyOrNot', (req, res) => {
-    console.log(req.body);
 
     logins.findOne({
         _id: req.body.id
@@ -739,7 +737,7 @@ users.post('/emailVerifyOrNot', (req, res) => {
 });
 
 users.post('/submitServiceReport', (req, res) => {
-    console.log(req.body);
+    
     serviceReport.create(req.body)
         .then(doc => {
             if (doc) {
@@ -751,7 +749,7 @@ users.post('/submitServiceReport', (req, res) => {
 });
 
 users.post('/getAllServiceReport', (req, res) => {
-    console.log(req.body);
+   
     serviceReport.find({
         userId: req.body.userId
     }).then(doc => {

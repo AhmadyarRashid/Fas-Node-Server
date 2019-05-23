@@ -36,9 +36,9 @@ mongoose
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.log(err))
 
-var router = express.Router();
-router.use('/users', Users)
-router.use('/seller', Seller)
+
+app.use('/users', Users)
+app.use('/seller', Seller)
 
 app.post("/charge", async (req, res) => {
     console.log('recevie data', req.body);
