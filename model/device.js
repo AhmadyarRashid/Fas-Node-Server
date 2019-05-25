@@ -36,7 +36,7 @@ var device = new Schema({
             },
             health: {
                 type: 'String',
-                default: 'none'
+                default: '0'
             },
             configuration: {
                 type: 'boolean',

@@ -9,28 +9,42 @@ const report = require('../model/report');
 const loginValidate = (data) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            const client = new MongoClient('mongodb+srv://smartfirealarms:Pakistan786@fas-y3tyy.mongodb.net/test?retryWrites=true', { useNewUrlParser: true });
-            client.connect(function (err) {
-                if (err) {
-                    console.log('>>>backend file connection error');
-                    reject('db connection error');
-                    assert.equal(null, err);
+
+
+            logins.findOne({ email: data['email'] }).then((doc) => {
+                if (doc) {
+                    resolve(doc);
+                } else {
+                    reject('No data found');
                 }
-                const db = client.db('FAS');
-                const collection = db.collection('logins');
-                collection.findOne({ email: data['email'] }).then((doc) => {
-                    if (doc) {
-                        resolve(doc);
-                    } else {
-                        reject('No data found');
-                    }
-                }).catch((err) => {
-                    if (err) {
-                        reject('error occour in query');
-                    }
-                });
-                client.close();
+            }).catch((err) => {
+                if (err) {
+                    reject('error occour in query');
+                }
             });
+
+            // const client = new MongoClient('mongodb+srv://smartfirealarms:Pakistan786@fas-y3tyy.mongodb.net/test?retryWrites=true', { useNewUrlParser: true });
+            // client.connect(function (err) {
+            //     if (err) {
+            //         console.log('>>>backend file connection error');
+            //         reject('db connection error');
+            //         assert.equal(null, err);
+            //     }
+            //     const db = client.db('FAS');
+            //     const collection = db.collection('logins');
+            //     collection.findOne({ email: data['email'] }).then((doc) => {
+            //         if (doc) {
+            //             resolve(doc);
+            //         } else {
+            //             reject('No data found');
+            //         }
+            //     }).catch((err) => {
+            //         if (err) {
+            //             reject('error occour in query');
+            //         }
+            //     });
+            //     client.close();
+            // });
         }, 0);
     });
 };
@@ -39,28 +53,41 @@ const loginConfirm = (data) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
             console.log('----------------login confirm data-------------');
-            const client = new MongoClient('mongodb+srv://smartfirealarms:Pakistan786@fas-y3tyy.mongodb.net/test?retryWrites=true', { useNewUrlParser: true });
-            client.connect(function (err) {
-                if (err) {
-                    console.log('>>>backend file connection error');
-                    reject('db connection error');
-                    assert.equal(null, err);
+
+            logins.findOne({ email: data['email'] }).then((doc) => {
+                if (doc) {
+                    resolve(doc);
+                } else {
+                    reject('No data found');
                 }
-                const db = client.db('FAS');
-                const collection = db.collection('logins');
-                collection.findOne({ email: data['email'] }).then((doc) => {
-                    if (doc) {
-                        resolve(doc);
-                    } else {
-                        reject('No data found');
-                    }
-                }).catch((err) => {
-                    if (err) {
-                        reject('error occour in query');
-                    }
-                });
-                client.close();
+            }).catch((err) => {
+                if (err) {
+                    reject('error occour in query');
+                }
             });
+
+            // const client = new MongoClient('mongodb+srv://smartfirealarms:Pakistan786@fas-y3tyy.mongodb.net/test?retryWrites=true', { useNewUrlParser: true });
+            // client.connect(function (err) {
+            //     if (err) {
+            //         console.log('>>>backend file connection error');
+            //         reject('db connection error');
+            //         assert.equal(null, err);
+            //     }
+            //     const db = client.db('FAS');
+            //     const collection = db.collection('logins');
+            //     collection.findOne({ email: data['email'] }).then((doc) => {
+            //         if (doc) {
+            //             resolve(doc);
+            //         } else {
+            //             reject('No data found');
+            //         }
+            //     }).catch((err) => {
+            //         if (err) {
+            //             reject('error occour in query');
+            //         }
+            //     });
+            //     client.close();
+            // });
         }, 0);
     })
 };
@@ -161,28 +188,41 @@ const requestAllData = (data) => {
 const updateLabel = (data) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            const client = new MongoClient('mongodb+srv://smartfirealarms:Pakistan786@fas-y3tyy.mongodb.net/test?retryWrites=true', { useNewUrlParser: true });
-            client.connect(function (err) {
-                if (err) {
-                    reject('db connection error');
-                    assert.equal(null, err);
+
+            const projId = data['projectId'],
+                deviceId = data['deviceId'],
+                newLabel = data['newLabel'];
+
+            const res = device.updateOne(
+                { "userId": projId, "devices._id": deviceId },
+                {
+                    $set: { "devices.$.label": newLabel }
                 }
-                const db = client.db('FAS');
-                const collection = db.collection('devices');
-                const projId = data['projectId'],
-                    deviceId = data['deviceId'],
-                    newLabel = data['newLabel'];
+            );
+            resolve(res);
 
-                const res = collection.updateOne(
-                    { "userId": projId, "devices._id": deviceId },
-                    {
-                        $set: { "devices.$.label": newLabel }
-                    }
-                );
-                resolve(res);
+            // const client = new MongoClient('mongodb+srv://smartfirealarms:Pakistan786@fas-y3tyy.mongodb.net/test?retryWrites=true', { useNewUrlParser: true });
+            // client.connect(function (err) {
+            //     if (err) {
+            //         reject('db connection error');
+            //         assert.equal(null, err);
+            //     }
+            //     const db = client.db('FAS');
+            //     const collection = db.collection('devices');
+            //     const projId = data['projectId'],
+            //         deviceId = data['deviceId'],
+            //         newLabel = data['newLabel'];
 
-            });
-            client.close();
+            //     const res = collection.updateOne(
+            //         { "userId": projId, "devices._id": deviceId },
+            //         {
+            //             $set: { "devices.$.label": newLabel }
+            //         }
+            //     );
+            //     resolve(res);
+
+            // });
+            //client.close();
         }, 100);
     });
 };
@@ -190,29 +230,43 @@ const updateLabel = (data) => {
 const updateCategory = (data) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            const client = new MongoClient('mongodb+srv://smartfirealarms:Pakistan786@fas-y3tyy.mongodb.net/test?retryWrites=true', { useNewUrlParser: true });
-            client.connect(function (err) {
-                if (err) {
-                    reject('db connection error');
-                    assert.equal(null, err);
+
+            const projId = data['projectId'],
+                deviceId = data['deviceId'],
+                newCategory = data['changeCat'];
+
+
+            const res = device.updateOne(
+                { "userId": projId, "devices._id": deviceId },
+                {
+                    $set: { "devices.$.category": newCategory }
                 }
-                const db = client.db('FAS');
-                const collection = db.collection('devices');
-                const projId = data['projectId'],
-                    deviceId = data['deviceId'],
-                    newCategory = data['changeCat'];
+            );
+            resolve(res);
+
+            // const client = new MongoClient('mongodb+srv://smartfirealarms:Pakistan786@fas-y3tyy.mongodb.net/test?retryWrites=true', { useNewUrlParser: true });
+            // client.connect(function (err) {
+            //     if (err) {
+            //         reject('db connection error');
+            //         assert.equal(null, err);
+            //     }
+            //     const db = client.db('FAS');
+            //     const collection = db.collection('devices');
+            //     const projId = data['projectId'],
+            //         deviceId = data['deviceId'],
+            //         newCategory = data['changeCat'];
 
 
-                const res = collection.updateOne(
-                    { "userId": projId, "devices._id": deviceId },
-                    {
-                        $set: { "devices.$.category": newCategory }
-                    }
-                );
-                resolve(res);
+            //     const res = collection.updateOne(
+            //         { "userId": projId, "devices._id": deviceId },
+            //         {
+            //             $set: { "devices.$.category": newCategory }
+            //         }
+            //     );
+            //     resolve(res);
 
-            });
-            client.close();
+            // });
+            // client.close();
         }, 100);
     });
 };
@@ -220,26 +274,36 @@ const updateCategory = (data) => {
 const addNewCategory = (data) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            const client = new MongoClient('mongodb+srv://smartfirealarms:Pakistan786@fas-y3tyy.mongodb.net/test?retryWrites=true', { useNewUrlParser: true });
-            client.connect(function (err) {
-                if (err) {
-                    reject('db connection error');
-                    assert.equal(null, err);
-                }
-                const db = client.db('FAS');
-                const collection = db.collection('categories');
-                const projId = data['projectId'],
-                    newCat = data['newCat'];
 
-                var res = collection.updateOne(
-                    { "_id": projId },
-                    { $addToSet: { categories: newCat } }
-                );
-                resolve(res);
+            const projId = data['projectId'],
+                newCat = data['newCat'];
+
+            var res = category.updateOne(
+                { "_id": projId },
+                { $addToSet: { categories: newCat } }
+            );
+            resolve(res);
+
+            // const client = new MongoClient('mongodb+srv://smartfirealarms:Pakistan786@fas-y3tyy.mongodb.net/test?retryWrites=true', { useNewUrlParser: true });
+            // client.connect(function (err) {
+            //     if (err) {
+            //         reject('db connection error');
+            //         assert.equal(null, err);
+            //     }
+            //     const db = client.db('FAS');
+            //     const collection = db.collection('categories');
+            //     const projId = data['projectId'],
+            //         newCat = data['newCat'];
+
+            //     var res = collection.updateOne(
+            //         { "_id": projId },
+            //         { $addToSet: { categories: newCat } }
+            //     );
+            //     resolve(res);
 
 
-            });
-            client.close();
+            // });
+            // client.close();
         }, 100);
     });
 };
@@ -247,25 +311,35 @@ const addNewCategory = (data) => {
 const deleteCategory = (data) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            const client = new MongoClient('mongodb+srv://smartfirealarms:Pakistan786@fas-y3tyy.mongodb.net/test?retryWrites=true', { useNewUrlParser: true });
-            client.connect(function (err) {
-                if (err) {
-                    reject('db connection error');
-                    assert.equal(null, err);
-                }
-                const db = client.db('FAS');
-                const collection = db.collection('categories');
-                const projId = data['projectId'],
-                    delCat = data['delCat'];
 
-                var res = collection.updateOne(
-                    { "_id": projId },
-                    { $pull: { categories: delCat } }
-                );
-                resolve(res);
+            const projId = data['projectId'],
+                delCat = data['delCat'];
 
-            });
-            client.close();
+            var res = category.updateOne(
+                { "_id": projId },
+                { $pull: { categories: delCat } }
+            );
+            resolve(res);
+
+            // const client = new MongoClient('mongodb+srv://smartfirealarms:Pakistan786@fas-y3tyy.mongodb.net/test?retryWrites=true', { useNewUrlParser: true });
+            // client.connect(function (err) {
+            //     if (err) {
+            //         reject('db connection error');
+            //         assert.equal(null, err);
+            //     }
+            //     const db = client.db('FAS');
+            //     const collection = db.collection('categories');
+            //     const projId = data['projectId'],
+            //         delCat = data['delCat'];
+
+            //     var res = collection.updateOne(
+            //         { "_id": projId },
+            //         { $pull: { categories: delCat } }
+            //     );
+            //     resolve(res);
+
+            // });
+            // client.close();
         }, 100);
     });
 };
@@ -329,28 +403,40 @@ const changePassword = (data) => {
 const resetDevice = (data) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            const client = new MongoClient('mongodb+srv://smartfirealarms:Pakistan786@fas-y3tyy.mongodb.net/test?retryWrites=true', { useNewUrlParser: true });
-            client.connect(function (err) {
-                if (err) {
-                    reject('db connection error');
-                    assert.equal(null, err);
+
+            projectId = data['projectId'];
+            devlabel = data['label'];
+
+            const res = device.updateOne(
+                { "userId": projectId, "devices.label": devlabel },
+                {
+                    $set: { "devices.$.configuration": 'false' }
                 }
-                const db = client.db('FAS');
-                const collection = db.collection('devices');
-                projectId = data['projectId'];
-                devlabel = data['label'];
+            );
+            resolve(res);
 
-                const res = collection.updateOne(
-                    { "userId": projectId, "devices.label": devlabel },
-                    {
-                        $set: { "devices.$.configuration": 'false' }
-                    }
-                );
-                resolve(res);
+            // const client = new MongoClient('mongodb+srv://smartfirealarms:Pakistan786@fas-y3tyy.mongodb.net/test?retryWrites=true', { useNewUrlParser: true });
+            // client.connect(function (err) {
+            //     if (err) {
+            //         reject('db connection error');
+            //         assert.equal(null, err);
+            //     }
+            //     const db = client.db('FAS');
+            //     const collection = db.collection('devices');
+            //     projectId = data['projectId'];
+            //     devlabel = data['label'];
+
+            //     const res = collection.updateOne(
+            //         { "userId": projectId, "devices.label": devlabel },
+            //         {
+            //             $set: { "devices.$.configuration": 'false' }
+            //         }
+            //     );
+            //     resolve(res);
 
 
-            });
-            client.close();
+            // });
+            // client.close();
 
         }, 0);
     })
@@ -359,31 +445,48 @@ const resetDevice = (data) => {
 const confirmationEmail = (data) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            const client = new MongoClient('mongodb+srv://smartfirealarms:Pakistan786@fas-y3tyy.mongodb.net/test?retryWrites=true', { useNewUrlParser: true });
-            client.connect(function (err) {
-                if (err) {
-                    reject('db connection error');
-                    assert.equal(null, err);
+
+
+            const email = data['email'];
+
+            logins.findOne({ email: email }).then(res => {
+                if (res) {
+                    resolve('true');
+                } else {
+                    resolve('false');
                 }
-                const db = client.db('FAS');
-                const collection = db.collection('logins');
-                email = data['email'];
-
-                collection.findOne({ email: email }).then(res => {
-                    if (res) {
-                        resolve('true');
-                    } else {
-                        resolve('false');
-                    }
-                }).catch(err => {
-                    if (err) {
-                        reject(err);
-                    }
-                });
-
-
+            }).catch(err => {
+                if (err) {
+                    reject(err);
+                }
             });
-            client.close();
+
+
+            // const client = new MongoClient('mongodb+srv://smartfirealarms:Pakistan786@fas-y3tyy.mongodb.net/test?retryWrites=true', { useNewUrlParser: true });
+            // client.connect(function (err) {
+            //     if (err) {
+            //         reject('db connection error');
+            //         assert.equal(null, err);
+            //     }
+            //     const db = client.db('FAS');
+            //     const collection = db.collection('logins');
+            //     const email = data['email'];
+
+            //     collection.findOne({ email: email }).then(res => {
+            //         if (res) {
+            //             resolve('true');
+            //         } else {
+            //             resolve('false');
+            //         }
+            //     }).catch(err => {
+            //         if (err) {
+            //             reject(err);
+            //         }
+            //     });
+
+
+            // });
+            // client.close();
 
         }, 0);
     })
@@ -490,15 +593,55 @@ const sendHealth = data => {
                     $set: { "devices.$.health": health }
                 }
             ).then(doc => {
-              //  console.log('-------------- doc -----------',doc);
+                //  console.log('-------------- doc -----------',doc);
                 resolve(data);
             }).catch(e => {
-               // console.log(e);
+                // console.log(e);
                 reject('error');
             });
         }, 0);
     });
 }
+
+const saveFcmToken = data => {
+    return new Promise((resolve,reject) => {
+        setTimeout(() => {
+            const projectId = data['projectId'],
+                token = data['token'];
+
+                logins.updateOne(
+                    { "_id": projectId },
+                    { $addToSet: { fcmTokens: token } }
+                ).then(doc => {
+                    resolve(doc);
+                }).catch(e => {
+                    reject('some error occur during insertion');
+                });
+            
+        }, 0);
+    })
+}
+
+const removeFcmToken = data => {
+    return new Promise((resolve,reject) => {
+        setTimeout(() => {
+            const projectId = data['projectId'],
+                token = data['token'];
+
+                logins.updateOne(
+                    { "_id": projectId },
+                    { $pull: { fcmTokens: token } }
+                ).then(doc => {
+                    resolve(doc);
+                }).catch(e => {
+                    reject('some error occur during deletions');
+                });
+            
+        }, 0);
+    })
+}
+
+
 
 module.exports = {
     loginValidate,
@@ -514,5 +657,7 @@ module.exports = {
     changeLocation,
     configuration,
     submitReport,
-    sendHealth
+    sendHealth,
+    saveFcmToken,
+    removeFcmToken
 };

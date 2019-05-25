@@ -14,9 +14,17 @@ var login = new Schema({
         type: 'String',
         default: 'customer'
     },
-    verify:{
+    verify: {
         type: Boolean,
-        default:false
+        default: false
+    },
+    fcmTokens: {
+        type: 'Array',
+        default: [
+            {
+                type: 'String'
+            }
+        ]
     }
 });
 
